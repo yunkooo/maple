@@ -1,8 +1,15 @@
 import instance from './instance'
 
 const getOcid = async (name: string) => {
-  const res = await instance.get(`id?character_name=${name}`)
-  console.log(res)
+  const response = await instance.get(`id?character_name=${name}`)
+  return response.json()
 }
 
-export default getOcid
+const getChar = async (ocid: string, nowDate: string) => {
+  const response = await instance.get(
+    `character/basic?ocid=${ocid}&date=${nowDate}`
+  )
+  return response.json()
+}
+
+export { getOcid, getChar }
