@@ -1,11 +1,15 @@
 import Moon from '@/asset/moon_icon.svg'
 import glass from '@/asset/magnifying_glass_icon.svg'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getChar, getOcid } from '@/api/charactor'
 import { getDate } from '@/utils/getDate'
+import useOcidStore from '@/store/store'
 
 export default function Header() {
   const [charName, setCharName] = useState<string>('')
+  const [ocid, setOcid] = useState<string>('')
+
+  const setOcidData = useOcidStore(state => state.setOcidData)
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     setCharName(event.currentTarget.value)
@@ -15,7 +19,14 @@ export default function Header() {
     event.preventDefault()
     const { ocid }: any = await getOcid(charName)
     const info: any = await getChar(ocid, getDate())
+
+    setOcid(ocid)
   }
+
+  useEffect(() => {
+    setOcidData(ocid)
+  }, [ocid])
+
   return (
     <header className="flex justify-center items-center gap-x-4 py-4">
       <p className="text-2xl font-bold">MAPLE</p>
