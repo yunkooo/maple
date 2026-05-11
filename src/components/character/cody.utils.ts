@@ -2,6 +2,10 @@ import { CashEquipmentResponse, CashItem } from '@/api/character.types'
 
 export type PresetNumber = 1 | 2 | 3
 
+export type CodyViewKey = 'base' | PresetNumber
+
+export const CASH_PRESET_NUMBERS = [1, 2, 3] as const
+
 export function getActivePresetNumber(
   cashData: CashEquipmentResponse | null
 ): PresetNumber {
@@ -12,15 +16,14 @@ export function getActivePresetNumber(
   return 1
 }
 
-export function getActiveCashItems(
+export function getCashItemsByPreset(
   cashData: CashEquipmentResponse | null,
+  presetNo: PresetNumber,
   isAdditional = false
 ): CashItem[] {
   if (cashData === null) {
     return []
   }
-
-  const presetNo = getActivePresetNumber(cashData)
 
   if (isAdditional) {
     const presetItems =
@@ -41,6 +44,30 @@ export function getActiveCashItems(
         : cashData.cash_item_equipment_preset_3
 
   return presetItems || cashData.cash_item_equipment_base || []
+}
+
+export function getBaseCashItems(
+  cashData: CashEquipmentResponse | null,
+  isAdditional = false
+): CashItem[] {
+  if (cashData === null) {
+    return []
+  }
+
+  return isAdditional
+    ? cashData.additional_cash_item_equipment_base || []
+    : cashData.cash_item_equipment_base || []
+}
+
+export function getActiveCashItems(
+  cashData: CashEquipmentResponse | null,
+  isAdditional = false
+): CashItem[] {
+  return getCashItemsByPreset(
+    cashData,
+    getActivePresetNumber(cashData),
+    isAdditional
+  )
 }
 
 export function findCashItemBySlot(

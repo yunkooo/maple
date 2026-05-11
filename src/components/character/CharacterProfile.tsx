@@ -1,4 +1,5 @@
 import { useCharacterBasic } from '@/hooks/useCharacterBasic'
+import { useGuildMark } from '@/hooks/useGuildMark'
 import {
   BadgeCheck,
   CalendarDays,
@@ -10,6 +11,12 @@ import CashEquipmentSummary from './CashEquipmentSummary'
 
 type Props = {
   ocid: string | undefined
+}
+
+type SummaryItem = {
+  imageUrl?: string
+  label: string
+  value: string
 }
 
 export default function CharacterProfile({ ocid = '' }: Props) {
@@ -24,19 +31,22 @@ export default function CharacterProfile({ ocid = '' }: Props) {
   const worldName = basicData.world_name || '월드 정보 없음'
   const className = basicData.character_class || '직업 정보 없음'
   const guildName = basicData.character_guild_name || '소속 길드 없음'
+  const guildMarkUrl = useGuildMark({
+    date: displayDate,
+    guildName: basicData.character_guild_name,
+    worldName: basicData.world_name
+  })
   const levelText = basicData.character_level
     ? `Lv.${basicData.character_level}`
     : '레벨 정보 없음'
   const expText = basicData.character_exp_rate
     ? `${basicData.character_exp_rate}%`
     : '0%'
-  const summaryItems = [
-    ['월드', worldName],
-    ['직업', className],
-    ['레벨', levelText],
-    ['길드', guildName],
-    ['기준일', displayDate],
-    ['성별', basicData.character_gender || '-']
+  const summaryItems: SummaryItem[] = [
+    { label: '월드', value: worldName },
+    { label: '직업', value: className },
+    { label: '레벨', value: levelText },
+    { imageUrl: guildMarkUrl, label: '길드', value: guildName }
   ]
 
   return (
@@ -82,16 +92,31 @@ export default function CharacterProfile({ ocid = '' }: Props) {
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2">
-            {summaryItems.map(([label, value]) => (
+            {summaryItems.map(item => (
               <div
                 className="rounded-lg border border-white/70 bg-white/70 p-3 shadow-sm dark:border-white/10 dark:bg-white/[0.06]"
-                key={label}>
-                <p className="text-xs font-bold text-muted-foreground">
-                  {label}
-                </p>
-                <p className="mt-1 truncate text-base font-black text-foreground">
-                  {value}
-                </p>
+                key={item.label}>
+                <div className="flex min-w-0 items-center gap-3">
+                  {item.imageUrl ? (
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-emerald-200/80 bg-white/85 shadow-sm dark:border-emerald-300/20 dark:bg-white/10">
+                      <img
+                        alt={`${item.value} 길드 마크`}
+                        className="h-8 w-8 object-contain [image-rendering:pixelated]"
+                        decoding="async"
+                        loading="lazy"
+                        src={item.imageUrl}
+                      />
+                    </span>
+                  ) : null}
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-muted-foreground">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 truncate text-base font-black text-foreground">
+                      {item.value}
+                    </p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
