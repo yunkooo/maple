@@ -27,11 +27,11 @@ export default function HomePage() {
             메이플 캐릭터 조회
           </p>
           <h1 className="text-3xl font-black tracking-normal text-foreground sm:text-4xl">
-            닉네임으로 캐릭터 정보를 바로 찾아보세요
+            캐릭터 닉네임 하나로 필요한 정보를 이어서 확인하세요
           </h1>
           <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-            캐릭터 기본 정보부터 장비, 스탯, 코디 정보까지 검색 흐름 안에서
-            자연스럽게 확인할 수 있도록 정리했습니다.
+            닉네임을 입력하면 캐릭터, 오늘 리포트, 코디 화면이 같은 캐릭터를
+            기준으로 이어집니다.
           </p>
         </div>
 

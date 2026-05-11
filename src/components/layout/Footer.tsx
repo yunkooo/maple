@@ -2,7 +2,7 @@ import github from '@/assets/github-mark.svg'
 
 export default function Footer() {
   return (
-    <footer className="mx-auto mt-10 w-full max-w-6xl border-t border-border px-4 py-8 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
+    <footer className="mx-auto mt-10 w-full max-w-[92rem] border-t border-border px-4 py-8 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
       <a
         className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card"
         href="https://github.com/yunkooo"
