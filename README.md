@@ -1,5 +1,9 @@
 # React + TypeScript + Vite
 
+## Project Notes
+
+- [메이플스토리 OpenAPI 백엔드 구조](docs/maplestory-backend-structure.md)
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
@@ -20,8 +24,8 @@ export default {
     ecmaVersion: 'latest',
     sourceType: 'module',
     project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+    tsconfigRootDir: __dirname
+  }
 }
 ```
 
