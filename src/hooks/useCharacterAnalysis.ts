@@ -64,7 +64,7 @@ const initialAnalysisData: CharacterAnalysisData = {
 const getSettledValue = <T>(result: PromiseSettledResult<T>) =>
   result.status === 'fulfilled' ? result.value : null
 
-const getCharacterAnalysis = async (
+export const getCharacterAnalysis = async (
   ocid: string,
   date: string
 ): Promise<CharacterAnalysisData> => {
@@ -95,6 +95,24 @@ const getCharacterAnalysis = async (
     getHexaMatrixStat(ocid, date),
     getCharacterSkill(ocid, date, '6')
   ])
+  const results = [
+    stat,
+    setEffect,
+    ability,
+    symbol,
+    linkSkill,
+    union,
+    unionRaider,
+    unionArtifact,
+    unionChampion,
+    hexa,
+    hexaStat,
+    sixthSkill
+  ]
+
+  if (results.every(result => result.status === 'rejected')) {
+    throw new Error('캐릭터 분석 데이터를 불러오지 못했습니다.')
+  }
 
   return {
     ability: getSettledValue(ability),

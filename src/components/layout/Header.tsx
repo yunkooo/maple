@@ -1,4 +1,4 @@
-import iconUrl from '@/assets/icon.png'
+import iconUrl from '@/assets/icon.svg'
 import { Bell, Moon, Search, Sun, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -64,8 +64,16 @@ const getNavigationItems = (nickname: string): NavigationItem[] => {
   ]
 }
 
-const getSearchTargetPath = (nickname: string) => {
+export const getSearchTargetPath = (pathname: string, nickname: string) => {
   const encodedNickname = encodeURIComponent(nickname)
+
+  if (pathname === '/cody') {
+    return `/cody?nickname=${encodedNickname}`
+  }
+
+  if (pathname === '/report' || pathname.startsWith('/report/')) {
+    return `/report/${encodedNickname}`
+  }
 
   return `/${encodedNickname}`
 }
@@ -121,7 +129,7 @@ export default function Header() {
 
       setLastNickname(nickName)
       setStoredNickname(nickName)
-      navigate(getSearchTargetPath(nickName))
+      navigate(getSearchTargetPath(location.pathname, nickName))
     }
   }
 
