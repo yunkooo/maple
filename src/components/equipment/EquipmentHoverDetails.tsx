@@ -233,7 +233,7 @@ const formatExpireDate = (date?: string | null) => {
 
 function EmptyPotentialState() {
   return (
-    <section className="space-y-1 border-t border-dashed border-white/25 pt-2 text-[11px] font-bold leading-[15px] text-white/45">
+    <section className="space-y-1 border-t border-dashed border-white/35 pt-2 text-xs font-bold leading-5 text-white/70">
       <p>잠재능력 : 없음</p>
       <p>에디셔널 잠재능력 : 없음</p>
     </section>
@@ -250,7 +250,7 @@ function StarRows({ starforce }: { starforce: number }) {
   ]
 
   return (
-    <div className="mx-auto w-fit space-y-0.5 text-[11px] leading-none tracking-[0.5px]">
+    <div className="mx-auto w-fit space-y-0.5 text-sm leading-none tracking-normal">
       {rows.map((row, rowIndex) => (
         <div
           key={rowIndex}
@@ -294,26 +294,26 @@ function PotentialSection({
   }
 
   return (
-    <section className="space-y-1 border-t border-dashed border-white/25 pt-2">
-      <div className="flex items-center gap-1.5 text-[11px] font-black">
+    <section className="space-y-1.5 border-t border-dashed border-white/35 pt-2">
+      <div className="flex items-center gap-1.5 text-xs font-black">
         <span
           className={cn(
-            'inline-flex h-3.5 min-w-3.5 items-center justify-center rounded border bg-black/30 px-1 text-[10px] leading-none',
+            'inline-flex h-4 min-w-4 items-center justify-center rounded border bg-black/40 px-1 text-[11px] leading-none',
             getGradeClass(grade)
           )}>
           {getGradeBadgeLabel(grade)}
         </span>
-        <h3 className={cn('text-[11px] font-black', getGradeClass(grade))}>
+        <h3 className={cn('text-xs font-black', getGradeClass(grade))}>
           {title}
         </h3>
       </div>
-      <div className="space-y-0.5 text-[11px] font-bold leading-[15px] text-white">
+      <div className="space-y-1 text-xs font-bold leading-5 text-white">
         {options.length > 0 ? (
           options.map((option, index) => (
-            <p key={`${title}-${index}-${option}`}>{option}</p>
+            <p key={`${title}-${index}`}>{option}</p>
           ))
         ) : (
-          <p className="text-white/55">옵션 정보 없음</p>
+          <p className="text-white/70">옵션 정보 없음</p>
         )}
       </div>
     </section>
@@ -326,7 +326,7 @@ function StatRows({ rows }: { rows: StatRow[] }) {
   }
 
   return (
-    <dl className="space-y-0.5">
+    <dl className="space-y-1">
       {rows.map(row => {
         const isBaseOnly = row.parts.length === 0
         const primaryTextClass = isBaseOnly ? 'text-white' : 'text-cyan-300'
@@ -334,7 +334,7 @@ function StatRows({ rows }: { rows: StatRow[] }) {
         return (
           <div
             key={row.key}
-            className="flex flex-wrap items-baseline gap-x-1 text-[11px] font-black leading-[14px]">
+            className="flex flex-wrap items-baseline gap-x-1.5 text-xs font-black leading-5">
             <dt className={primaryTextClass}>{row.label} :</dt>
             <dd className={primaryTextClass}>{row.total}</dd>
             {row.parts.length > 0 && (
@@ -476,31 +476,27 @@ export default function EquipmentHoverDetails({
         role="tooltip"
         style={panelStyle}
         className={cn(
-          'pointer-events-none invisible fixed z-[70] w-[min(24rem,calc(100vw-1rem))] overflow-visible rounded-lg border border-white/75 bg-neutral-950/90 p-2.5 text-left text-white opacity-0 shadow-2xl shadow-black/50 backdrop-blur-sm transition duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 max-sm:w-[calc(100vw-1rem)]',
+          'pointer-events-none invisible fixed z-[70] w-[min(25rem,calc(100vw-1rem))] overflow-visible rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 max-sm:w-[calc(100vw-1rem)]',
           panelClassName
         )}>
-        <div className="pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(180deg,rgba(255,255,255,0.08),transparent_34%)]" />
-        <div className="relative space-y-1.5">
-          <span className="absolute -left-1 -top-1 text-xl leading-none text-white/35">
-            ☆
-          </span>
-
+        <div className="pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(180deg,rgba(255,255,255,0.1),transparent_34%)]" />
+        <div className="relative space-y-2">
           <header className="space-y-1 text-center">
             {starforce > 0 && <StarRows starforce={starforce} />}
-            <div className="space-y-0.5 border-b border-dashed border-white/25 pb-1.5">
-              <h2 className="text-sm font-black leading-snug text-white break-words">
+            <div className="space-y-1 border-b border-dashed border-white/35 pb-2">
+              <h2 className="break-words text-base font-black leading-snug text-white">
                 {itemName}
                 {starforce > 0 && (
                   <span className="ml-1 whitespace-nowrap">(+{starforce})</span>
                 )}
               </h2>
               {expireDateLabel && (
-                <p className="text-[11px] font-black text-orange-400">
+                <p className="text-xs font-black text-orange-300">
                   유효 기간 : {expireDateLabel}
                 </p>
               )}
               {itemGrade && (
-                <p className="text-[11px] font-black text-white/55">
+                <p className="text-xs font-black text-white/70">
                   ({itemGrade} 아이템)
                 </p>
               )}
@@ -521,10 +517,10 @@ export default function EquipmentHoverDetails({
                 </span>
               )}
             </div>
-            <div className="space-y-0.5 self-end text-[11px] font-black leading-[15px] text-white">
+            <div className="space-y-1 self-end text-xs font-black leading-5 text-white">
               <p>장비분류 : {partLabel}</p>
               {item.item_shape_name && (
-                <p className="text-[11px] text-white/70">
+                <p className="text-xs text-white/80">
                   외형 : {item.item_shape_name}
                 </p>
               )}
@@ -536,17 +532,17 @@ export default function EquipmentHoverDetails({
             cuttableCount ||
             scrollInfo ||
             soulInfo) && (
-            <section className="space-y-1 border-t border-dashed border-white/25 pt-1.5">
+            <section className="space-y-1.5 border-t border-dashed border-white/35 pt-2">
               {statRows.length > 0 && <StatRows rows={statRows} />}
               {itemDescription && (
-                <p className="text-[11px] font-bold leading-[15px] text-white">
+                <p className="text-xs font-bold leading-5 text-white">
                   {itemDescription}
                 </p>
               )}
               {(cuttableCount || scrollInfo || soulInfo) && (
                 <div
                   className={cn(
-                    'flex flex-wrap gap-x-2 gap-y-0.5 text-[11px] font-black leading-[15px]',
+                    'flex flex-wrap gap-x-2 gap-y-0.5 text-xs font-black leading-5',
                     isScrollUnavailable && !cuttableCount && !soulInfo
                       ? 'text-white/45'
                       : 'text-yellow-300'

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Stone Golem artifact">
+  <defs>
+    <linearGradient id="aura" x1="15" x2="113" y1="12" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="ice" x1="22" x2="107" y1="29" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#bdfbff"/>
+      <stop offset=".48" stop-color="#50dfff"/>
+      <stop offset="1" stop-color="#477ae8"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="3.8" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.35 0 0 0 0 0.35 0 0 0 0 1 0 0 0 .95 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M64 7c32 0 57 24 57 56s-25 58-57 58S7 95 7 63 32 7 64 7Z" opacity=".44"/>
+  <g filter="url(#glow)">
+    <path fill="url(#ice)" stroke="#756cff" stroke-linejoin="round" stroke-width="4" d="M31 51 21 37l16-16 14 9 12-15 13 15 16-9 15 16-11 14v31l-13 16H43L31 82z"/>
+    <rect width="48" height="37" x="40" y="49" fill="#4fc7f4" stroke="#9cf4ff" stroke-width="4" rx="9"/>
+    <rect width="14" height="33" x="23" y="58" fill="#61dffa" stroke="#9df7ff" stroke-width="4" rx="5"/>
+    <rect width="14" height="33" x="91" y="58" fill="#61dffa" stroke="#9df7ff" stroke-width="4" rx="5"/>
+    <rect width="16" height="14" x="45" y="91" fill="#77e7ff" stroke="#9df7ff" stroke-width="3" rx="3"/>
+    <rect width="16" height="14" x="68" y="91" fill="#77e7ff" stroke="#9df7ff" stroke-width="3" rx="3"/>
+    <circle cx="55" cy="65" r="4.5" fill="#5168d8"/>
+    <circle cx="73" cy="65" r="4.5" fill="#5168d8"/>
+    <path stroke="#5168d8" stroke-linecap="round" stroke-width="3.5" d="M58 77h12"/>
+    <path fill="#f2feff" opacity=".55" d="M46 31c8-6 18-8 30-4-9 4-17 8-27 16-4 3-8-8-3-12Z"/>
+  </g>
+</svg>

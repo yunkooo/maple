@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Stump artifact">
+  <defs>
+    <linearGradient id="aura" x1="16" x2="112" y1="13" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="30" x2="99" y1="25" y2="106" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b8fbff"/>
+      <stop offset=".45" stop-color="#42dfff"/>
+      <stop offset="1" stop-color="#4779e8"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="3.8" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.38 0 0 0 0 0.32 0 0 0 0 1 0 0 0 .94 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M64 8c31 0 55 24 55 55s-24 57-55 57S9 94 9 63 33 8 64 8Z" opacity=".43"/>
+  <g filter="url(#glow)">
+    <path fill="url(#wood)" stroke="#756cff" stroke-width="4" d="M32 27h55l12 11-7 62-14 10H48l-14-10-7-62z"/>
+    <path fill="#d9fbff" opacity=".55" d="M38 34h41c5 0 9 4 9 9v2H35v-8c0-2 1-3 3-3Z"/>
+    <path fill="#3da8ea" opacity=".6" d="M42 50h45l-4 37H46z"/>
+    <circle cx="65" cy="63" r="15" fill="none" stroke="#a8f6ff" stroke-width="5" opacity=".75"/>
+    <path stroke="#5168d8" stroke-linecap="round" stroke-width="5" d="M46 89v9M82 89v9"/>
+    <path fill="#8ff3ff" d="M26 43c-4 11-7 19-3 27 7-5 10-12 10-23zM101 44c6 10 7 19 3 27-6-4-9-12-10-22z" opacity=".82"/>
+    <path fill="#eefeff" opacity=".55" d="M46 30c12-3 23-2 31 1-8 2-17 4-29 9-5 2-8-8-2-10Z"/>
+  </g>
+</svg>

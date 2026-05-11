@@ -5,14 +5,21 @@ import {
   CashEquipmentResponse,
   CharacterBasic,
   CharacterOcidResponse,
+  CharacterSkillGrade,
+  CharacterSkillResponse,
   CharacterStatResponse,
   EquipmentResponse,
   HexaMatrixResponse,
+  HexaMatrixStatResponse,
   GuildRankingQuery,
   GuildRankingResponse,
   LinkSkillResponse,
+  PetEquipmentResponse,
   SetEffectResponse,
   SymbolEquipmentResponse,
+  UnionArtifactResponse,
+  UnionChampionResponse,
+  UnionRaiderResponse,
   UnionResponse
 } from './character.types'
 
@@ -49,6 +56,13 @@ const getEquipment = async (ocid: string, nowDate: string) => {
     searchParams: { ocid, date: nowDate }
   })
   return response.json<EquipmentResponse>()
+}
+
+const getPetEquipment = async (ocid: string, nowDate: string) => {
+  const response = await mapleClient.get('character/pet-equipment', {
+    searchParams: { ocid, date: nowDate }
+  })
+  return response.json<PetEquipmentResponse>()
 }
 
 const getCharacterStat = async (ocid: string, nowDate: string) => {
@@ -94,6 +108,22 @@ const getLinkSkill = async (ocid: string, nowDate: string) => {
   return response.json<LinkSkillResponse>()
 }
 
+const getCharacterSkill = async (
+  ocid: string,
+  nowDate: string,
+  skillGrade: CharacterSkillGrade
+) => {
+  const response = await mapleClient.get('character/skill', {
+    searchParams: {
+      ocid,
+      date: nowDate,
+      character_skill_grade: skillGrade
+    }
+  })
+
+  return response.json<CharacterSkillResponse>()
+}
+
 const getUnion = async (ocid: string, nowDate: string) => {
   const response = await mapleClient.get('user/union', {
     searchParams: { ocid, date: nowDate }
@@ -101,11 +131,42 @@ const getUnion = async (ocid: string, nowDate: string) => {
   return response.json<UnionResponse>()
 }
 
+const getUnionRaider = async (ocid: string, nowDate: string) => {
+  const response = await mapleClient.get('user/union-raider', {
+    searchParams: { ocid, date: nowDate }
+  })
+
+  return response.json<UnionRaiderResponse>()
+}
+
+const getUnionArtifact = async (ocid: string, nowDate: string) => {
+  const response = await mapleClient.get('user/union-artifact', {
+    searchParams: { ocid, date: nowDate }
+  })
+
+  return response.json<UnionArtifactResponse>()
+}
+
+const getUnionChampion = async (ocid: string, nowDate: string) => {
+  const response = await mapleClient.get('user/union-champion', {
+    searchParams: { ocid, date: nowDate }
+  })
+
+  return response.json<UnionChampionResponse>()
+}
+
 const getHexaMatrix = async (ocid: string, nowDate: string) => {
   const response = await mapleClient.get('character/hexamatrix', {
     searchParams: { ocid, date: nowDate }
   })
   return response.json<HexaMatrixResponse>()
+}
+
+const getHexaMatrixStat = async (ocid: string, nowDate: string) => {
+  const response = await mapleClient.get('character/hexamatrix-stat', {
+    searchParams: { ocid, date: nowDate }
+  })
+  return response.json<HexaMatrixStatResponse>()
 }
 
 export {
@@ -118,8 +179,14 @@ export {
   getEquipment,
   getGuildRanking,
   getHexaMatrix,
+  getHexaMatrixStat,
+  getCharacterSkill,
   getLinkSkill,
+  getPetEquipment,
   getSetEffect,
   getSymbolEquipment,
-  getUnion
+  getUnion,
+  getUnionArtifact,
+  getUnionChampion,
+  getUnionRaider
 }

@@ -1,0 +1,22 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="3" y="3" width="58" height="58" rx="7" fill="#6D4FEF"/>
+  <rect x="5" y="5" width="54" height="54" rx="5" fill="url(#bg)"/>
+  <path d="M10 47C17 35 20 22 16 9L9 9L9 55H22C18 53 14 50 10 47Z" fill="#F5F1FF" opacity="0.42"/>
+  <path d="M52 15C47 24 48 35 56 49V9H42C46 10 49 12 52 15Z" fill="#F7F1FF" opacity="0.3"/>
+  <path d="M14 13L18 11L20 15L24 17L20 19L18 23L16 19L12 17L16 15L14 13Z" fill="white" opacity="0.85"/>
+  <path d="M44 43L48 41L50 44L54 46L50 48L48 52L46 48L42 46L46 44L44 43Z" fill="white" opacity="0.8"/>
+  <path d="M9 34C18 31 25 32 33 38C41 44 49 43 56 37" stroke="#D7CCFF" stroke-width="3" opacity="0.65"/>
+  <path d="M21 16H15V48H21V16Z" fill="white"/>
+  <path d="M35 16H29V48H35V16Z" fill="white"/>
+  <path d="M49 16H43V48H49V16Z" fill="white"/>
+  <path d="M14 15H22V20H14V15ZM14 44H22V49H14V44ZM28 15H36V20H28V15ZM28 44H36V49H28V44ZM42 15H50V20H42V15ZM42 44H50V49H42V44Z" fill="white"/>
+  <rect x="6.5" y="6.5" width="51" height="51" rx="4.5" stroke="#BFAEFF" stroke-width="3" opacity="0.95"/>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="5" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4531C9"/>
+      <stop offset="0.42" stop-color="#8B54FF"/>
+      <stop offset="0.7" stop-color="#A55DFF"/>
+      <stop offset="1" stop-color="#4D35D8"/>
+    </linearGradient>
+  </defs>
+</svg>

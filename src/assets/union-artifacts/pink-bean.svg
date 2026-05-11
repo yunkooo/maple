@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Pink Bean artifact">
+  <defs>
+    <linearGradient id="aura" x1="15" x2="113" y1="11" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="bean" x1="35" x2="94" y1="26" y2="105" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d7fbff"/>
+      <stop offset=".45" stop-color="#70e6ff"/>
+      <stop offset="1" stop-color="#5b8cff"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="3.8" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.48 0 0 0 0 0.36 0 0 0 0 1 0 0 0 .92 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M64 8c31 0 55 24 55 56s-24 56-55 56S9 96 9 64 33 8 64 8Z" opacity=".44"/>
+  <g filter="url(#glow)">
+    <path fill="url(#bean)" stroke="#7f6cff" stroke-linejoin="round" stroke-width="4" d="M33 70c0-19 10-34 31-34s31 15 31 34v16c0 14-11 24-31 24S33 100 33 86z"/>
+    <path fill="#8defff" stroke="#abfbff" stroke-width="3" d="m40 40 15-18 11 19zM88 40 73 22 62 41z"/>
+    <circle cx="53" cy="73" r="4.6" fill="#5168d8"/>
+    <circle cx="75" cy="73" r="4.6" fill="#5168d8"/>
+    <path stroke="#5168d8" stroke-linecap="round" stroke-width="3.5" d="M58 86c5 4 8 4 13 0"/>
+    <path fill="#effeff" opacity=".55" d="M44 49c8-8 19-12 32-10-12 4-21 10-29 21-3 4-8-7-3-11Z"/>
+    <path fill="#8ff3ff" opacity=".72" d="M23 65 12 75l13 8 11-12zM105 65l11 10-13 8-11-12z"/>
+  </g>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Orange Mushroom artifact">
+  <defs>
+    <linearGradient id="aura" x1="20" x2="108" y1="18" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="34" x2="96" y1="24" y2="77" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b8f7ff"/>
+      <stop offset=".45" stop-color="#68dfff"/>
+      <stop offset="1" stop-color="#5b8cff"/>
+    </linearGradient>
+    <linearGradient id="body" x1="42" x2="86" y1="58" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#bffcff"/>
+      <stop offset="1" stop-color="#78ccff"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 1 0 0 0 .95 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M64 6c30 0 54 22 54 53 0 33-22 61-54 61S10 92 10 59C10 28 34 6 64 6Z" opacity=".42"/>
+  <g filter="url(#glow)">
+    <path fill="url(#cap)" stroke="#7f6cff" stroke-width="4" d="M18 62c6-27 23-42 46-42s40 15 46 42c2 10-5 18-16 18H34c-11 0-18-8-16-18Z"/>
+    <path fill="#dffaff" opacity=".55" d="M42 32c6-6 17-9 26-7-4 7-12 15-24 17-5 1-7-6-2-10Z"/>
+    <circle cx="82" cy="42" r="8" fill="#e9fbff" opacity=".6"/>
+    <circle cx="50" cy="55" r="6" fill="#ecfeff" opacity=".55"/>
+    <path fill="url(#body)" stroke="#69c8ff" stroke-width="3" d="M40 67c0-12 10-22 24-22s24 10 24 22v16c0 14-10 24-24 24S40 97 40 83V67Z"/>
+    <circle cx="55" cy="77" r="4.2" fill="#5168d8"/>
+    <circle cx="73" cy="77" r="4.2" fill="#5168d8"/>
+    <path stroke="#5168d8" stroke-linecap="round" stroke-width="3" d="M59 88c4 4 8 4 12 0"/>
+    <path fill="#fbfdff" opacity=".55" d="M47 61c5-8 14-10 21-8-5 3-11 6-17 14-2 3-6-2-4-6Z"/>
+  </g>
+</svg>

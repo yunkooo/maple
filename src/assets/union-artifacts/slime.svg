@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Slime artifact">
+  <defs>
+    <linearGradient id="aura" x1="18" x2="109" y1="14" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="35" x2="92" y1="25" y2="103" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b7fbff"/>
+      <stop offset=".45" stop-color="#5ee6ff"/>
+      <stop offset="1" stop-color="#5d8aff"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="3.8" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.42 0 0 0 0 0.28 0 0 0 0 1 0 0 0 .92 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M65 9c30 0 53 24 53 55 0 32-22 55-54 55S11 96 11 64C11 33 35 9 65 9Z" opacity=".44"/>
+  <g filter="url(#glow)">
+    <path fill="url(#drop)" stroke="#7f6cff" stroke-width="4" d="M35 80c0-19 16-34 25-48 8-13 13-13 17-5 2 6 0 12 4 16 5 5 14 3 17 11 7 19-9 52-35 52-17 0-28-11-28-26Z"/>
+    <path fill="#f1feff" opacity=".55" d="M48 65c6-14 15-26 21-35 2-3 6-1 5 3-4 14-13 23-22 34-2 3-6 1-4-2Z"/>
+    <circle cx="56" cy="77" r="5" fill="#5168d8"/>
+    <circle cx="79" cy="77" r="5" fill="#5168d8"/>
+    <path stroke="#5168d8" stroke-linecap="round" stroke-width="3.4" d="M61 90c5 4 10 4 15 0"/>
+    <circle cx="93" cy="50" r="7" fill="#9ef3ff" opacity=".65"/>
+  </g>
+</svg>

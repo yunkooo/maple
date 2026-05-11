@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Balrog artifact">
+  <defs>
+    <linearGradient id="aura" x1="13" x2="115" y1="10" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="body" x1="26" x2="101" y1="27" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#bdfcff"/>
+      <stop offset=".45" stop-color="#42dfff"/>
+      <stop offset="1" stop-color="#446fe2"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="3.9" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.33 0 0 0 0 0.34 0 0 0 0 1 0 0 0 .95 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M64 6c32 0 58 25 58 57s-26 58-58 58S6 95 6 63 32 6 64 6Z" opacity=".44"/>
+  <g filter="url(#glow)">
+    <path fill="url(#body)" stroke="#756cff" stroke-linejoin="round" stroke-width="4" d="M34 55c0-18 13-31 30-31s30 13 30 31v24c0 18-13 31-30 31S34 97 34 79z"/>
+    <path fill="#67eaff" stroke="#9df7ff" stroke-width="3" d="M36 50c-10-6-19-14-22-27 14 1 27 9 34 21zM92 50c10-6 19-14 22-27-14 1-27 9-34 21z"/>
+    <path fill="#c4fbff" d="m42 36 7-19 9 17zM70 34l9-17 7 19z" opacity=".86"/>
+    <path fill="#2d86d8" opacity=".5" d="M44 61c10 10 30 10 40 0v17c-11 9-29 9-40 0z"/>
+    <path fill="#5168d8" d="m49 62 10 4-10 4zM79 62l-10 4 10 4z"/>
+    <path stroke="#2457bd" stroke-linecap="round" stroke-width="4" d="M56 82c6 4 11 4 17 0"/>
+    <path fill="#f1feff" opacity=".5" d="M46 37c11-7 26-7 36 0-12 0-22 3-33 11-5 3-8-8-3-11Z"/>
+  </g>
+</svg>

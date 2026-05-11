@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Horny Mushroom artifact">
+  <defs>
+    <linearGradient id="aura" x1="15" x2="113" y1="12" y2="114" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="30" x2="98" y1="17" y2="77" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c6fbff"/>
+      <stop offset=".5" stop-color="#68e2ff"/>
+      <stop offset="1" stop-color="#5587ff"/>
+    </linearGradient>
+    <linearGradient id="body" x1="39" x2="89" y1="59" y2="105" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c8fcff"/>
+      <stop offset="1" stop-color="#75ceff"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="3.7" result="blur"/>
+      <feColorMatrix in="blur" values="0 0 0 0 0.42 0 0 0 0 0.31 0 0 0 0 1 0 0 0 .94 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#aura)" d="M64 6c32 0 56 24 56 56s-24 59-56 59S8 94 8 62 32 6 64 6Z" opacity=".44"/>
+  <g filter="url(#glow)">
+    <path fill="url(#cap)" stroke="#7f6cff" stroke-width="4" d="M20 63c6-29 22-43 44-43s39 14 44 43c2 10-4 18-15 18H35c-11 0-17-8-15-18Z"/>
+    <path fill="#e7fbff" d="M46 28 56 14l5 18-9 10z" opacity=".9"/>
+    <path fill="#e7fbff" d="m78 29 8-15 7 17-6 12z" opacity=".85"/>
+    <circle cx="51" cy="51" r="7" fill="#eefeff" opacity=".6"/>
+    <circle cx="82" cy="45" r="9" fill="#e6fbff" opacity=".58"/>
+    <path fill="url(#body)" stroke="#67c9ff" stroke-width="3" d="M39 68c0-13 10-23 25-23s25 10 25 23v16c0 14-10 24-25 24S39 98 39 84V68Z"/>
+    <circle cx="55" cy="78" r="4.3" fill="#5168d8"/>
+    <circle cx="75" cy="78" r="4.3" fill="#5168d8"/>
+    <path stroke="#5168d8" stroke-linecap="round" stroke-width="3.3" d="M60 90c4 4 8 4 12 0"/>
+  </g>
+</svg>
