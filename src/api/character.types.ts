@@ -152,3 +152,14 @@ export type EquipmentResponse = {
   item_equipment_preset_3?: Equipment[] | null
   preset_no?: number | null
 }
+
+export type Notice = {
+  notice_id: number
+  title: string
+  url: string
+  date: string
+}
+
+export type NoticeResponse = {
+  notice?: Notice[]
+}
