@@ -1,6 +1,7 @@
+import CodySection from '@/components/character/CodySection'
 import EquipmentSection from '@/components/equipment/EquipmentSection'
 import NoticeSection from '@/components/notice/NoticeSection'
-import { Bell, PackageCheck } from 'lucide-react'
+import { Bell, PackageCheck, Shirt } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 
 type Props = {
@@ -26,6 +27,12 @@ export default function CharacterTabs({ ocid }: Props) {
             <Bell className="h-4 w-4" />
             공지
           </TabsTrigger>
+          <TabsTrigger
+            className="gap-2 rounded-md px-4 py-2 text-sm font-black text-emerald-900 hover:text-emerald-950 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm dark:text-emerald-100 dark:hover:text-white dark:data-[state=active]:bg-slate-950 dark:data-[state=active]:text-emerald-200"
+            value="cody">
+            <Shirt className="h-4 w-4" />
+            코디
+          </TabsTrigger>
         </TabsList>
         <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-muted-foreground">
           <span className="rounded-full border border-border bg-background px-3 py-1">
@@ -42,6 +49,11 @@ export default function CharacterTabs({ ocid }: Props) {
         className="mt-4 rounded-lg border border-border bg-card p-4 shadow-sm"
         value="notice">
         <NoticeSection />
+      </TabsContent>
+      <TabsContent
+        className="mt-4 rounded-lg border border-border bg-card p-4 shadow-sm"
+        value="cody">
+        <CodySection ocid={ocid} />
       </TabsContent>
     </Tabs>
   )
