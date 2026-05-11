@@ -1,6 +1,6 @@
 import CodySection from '@/components/character/CodySection'
 import EquipmentSection from '@/components/equipment/EquipmentSection'
-import NoticeSection from '@/components/notice/NoticeSection'
+import NoticeOverview from '@/components/notice/NoticeOverview'
 import { Bell, PackageCheck, Shirt } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 
@@ -48,7 +48,7 @@ export default function CharacterTabs({ ocid }: Props) {
       <TabsContent
         className="mt-4 rounded-lg border border-border bg-card p-4 shadow-sm"
         value="notice">
-        <NoticeSection />
+        <NoticeOverview />
       </TabsContent>
       <TabsContent
         className="mt-4 rounded-lg border border-border bg-card p-4 shadow-sm"

@@ -4,8 +4,7 @@ import {
   CashEquipmentResponse,
   CharacterBasic,
   CharacterOcidResponse,
-  EquipmentResponse,
-  NoticeResponse
+  EquipmentResponse
 } from './character.types'
 
 const getOcid = async (name: string) => {
@@ -43,9 +42,4 @@ const getEquipment = async (ocid: string, nowDate: string) => {
   return response.json<EquipmentResponse>()
 }
 
-const getNotice = async () => {
-  const response = await mapleClient.get('notice')
-  return response.json<NoticeResponse>()
-}
-
-export { getOcid, getChar, getCashItem, getBeauty, getEquipment, getNotice }
+export { getOcid, getChar, getCashItem, getBeauty, getEquipment }
