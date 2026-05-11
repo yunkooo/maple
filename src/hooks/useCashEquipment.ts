@@ -5,53 +5,39 @@ import {
   RequestStatus
 } from '@/api/character.types'
 import { getMapleApiDate } from '@/lib/mapleDate'
-import { useEffect, useState } from 'react'
+import { queryCacheTime } from '@/lib/queryCache'
+import { useQuery } from '@tanstack/react-query'
 
 export function useCashEquipment(ocid: string | undefined) {
-  const [cashData, setCashData] = useState<CashEquipmentResponse | null>(null)
-  const [beautyData, setBeautyData] = useState<BeautyEquipmentResponse | null>(
-    null
-  )
-  const [status, setStatus] = useState<RequestStatus>('idle')
+  const date = getMapleApiDate()
+  const query = useQuery<{
+    beautyData: BeautyEquipmentResponse
+    cashData: CashEquipmentResponse
+  }>({
+    enabled: Boolean(ocid),
+    gcTime: queryCacheTime.characterDailyData.gcTime,
+    queryFn: async () => {
+      const [cashData, beautyData] = await Promise.all([
+        getCashItem(ocid || '', date),
+        getBeauty(ocid || '', date)
+      ])
 
-  useEffect(() => {
-    let ignore = false
+      return { beautyData, cashData }
+    },
+    queryKey: ['character', 'cash-equipment', ocid, date],
+    staleTime: queryCacheTime.characterDailyData.staleTime
+  })
+  const status: RequestStatus = !ocid
+    ? 'idle'
+    : query.isLoading
+      ? 'loading'
+      : query.isError
+        ? 'error'
+        : 'idle'
 
-    const fetchCashData = async () => {
-      setCashData(null)
-      setBeautyData(null)
-
-      if (!ocid) {
-        setStatus('idle')
-        return
-      }
-
-      setStatus('loading')
-
-      try {
-        const [cashResponse, beautyResponse] = await Promise.all([
-          getCashItem(ocid, getMapleApiDate()),
-          getBeauty(ocid, getMapleApiDate())
-        ])
-
-        if (!ignore) {
-          setCashData(cashResponse)
-          setBeautyData(beautyResponse)
-          setStatus('idle')
-        }
-      } catch {
-        if (!ignore) {
-          setStatus('error')
-        }
-      }
-    }
-
-    fetchCashData()
-
-    return () => {
-      ignore = true
-    }
-  }, [ocid])
-
-  return { beautyData, cashData, status }
+  return {
+    beautyData: query.data?.beautyData ?? null,
+    cashData: query.data?.cashData ?? null,
+    status
+  }
 }

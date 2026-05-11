@@ -4,8 +4,9 @@ import {
   NoticeRequestStatus,
   UseNoticesResult
 } from '@/api/notice.types'
+import { queryCacheTime } from '@/lib/queryCache'
+import { useQuery } from '@tanstack/react-query'
 import { HTTPError } from 'ky'
-import { useEffect, useState } from 'react'
 
 type MapleApiErrorBody = {
   error?: {
@@ -36,41 +37,28 @@ const getNoticeErrorMessage = async (error: unknown) => {
 }
 
 export function useNotices(): UseNoticesResult {
-  const [notices, setNotices] = useState<DashboardNotice[]>([])
-  const [status, setStatus] = useState<NoticeRequestStatus>('idle')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [refreshedAt, setRefreshedAt] = useState<string | null>(null)
-
-  useEffect(() => {
-    let ignore = false
-
-    const fetchNotices = async () => {
-      setStatus('loading')
-      setErrorMessage('')
-
+  const query = useQuery({
+    gcTime: queryCacheTime.notices.gcTime,
+    queryFn: async () => {
       try {
-        const response = await getDashboardNotices()
-
-        if (!ignore) {
-          setNotices(response.notices)
-          setRefreshedAt(new Date().toISOString())
-          setStatus('idle')
-        }
+        return await getDashboardNotices()
       } catch (error) {
-        if (!ignore) {
-          setNotices([])
-          setStatus('error')
-          setErrorMessage(await getNoticeErrorMessage(error))
-        }
+        throw new Error(await getNoticeErrorMessage(error))
       }
-    }
-
-    fetchNotices()
-
-    return () => {
-      ignore = true
-    }
-  }, [])
+    },
+    queryKey: ['notices', 'dashboard'],
+    staleTime: queryCacheTime.notices.staleTime
+  })
+  const status: NoticeRequestStatus = query.isLoading
+    ? 'loading'
+    : query.isError
+      ? 'error'
+      : 'idle'
+  const errorMessage = query.error instanceof Error ? query.error.message : ''
+  const notices: DashboardNotice[] = query.data?.notices ?? []
+  const refreshedAt = query.dataUpdatedAt
+    ? new Date(query.dataUpdatedAt).toISOString()
+    : null
 
   return {
     errorMessage,

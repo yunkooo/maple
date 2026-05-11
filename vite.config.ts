@@ -6,7 +6,25 @@ import svgr from 'vite-plugin-svgr'
 const createNexonApiKeyGuard = (apiKey: string | undefined): Plugin => ({
   name: 'nexon-api-key-guard',
   configureServer(server) {
-    server.middlewares.use('/api/maplestory/v1', (_, response, next) => {
+    server.middlewares.use('/api/maplestory/v1', (request, response, next) => {
+      const host = request.headers.host?.split(':')[0]
+      const isLocalhostRequest =
+        host === 'localhost' || host === '127.0.0.1' || host === '::1'
+
+      if (!isLocalhostRequest) {
+        response.statusCode = 403
+        response.setHeader('Content-Type', 'application/json')
+        response.end(
+          JSON.stringify({
+            error: {
+              name: 'LOCAL_PROXY_FORBIDDEN',
+              message: 'Nexon API proxy is only available from localhost'
+            }
+          })
+        )
+        return
+      }
+
       if (apiKey) {
         next()
         return
@@ -40,6 +58,7 @@ export default defineConfig(({ mode }) => {
       ]
     },
     server: {
+      host: '127.0.0.1',
       proxy: {
         '/api/maplestory/v1': {
           target: 'https://open.api.nexon.com',

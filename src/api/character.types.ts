@@ -18,6 +18,28 @@ export type CharacterBasic = {
   world_name: string
 }
 
+export type GuildRankingQuery = {
+  date: string
+  guild_name?: string
+  ranking_type: 0 | 1 | 2
+  world_name?: string
+}
+
+export type GuildRankingItem = {
+  date?: string
+  guild_level?: number
+  guild_mark?: string
+  guild_master_name?: string
+  guild_name: string
+  guild_point?: number
+  ranking: number
+  world_name: string
+}
+
+export type GuildRankingResponse = {
+  ranking?: GuildRankingItem[]
+}
+
 export type CashItem = {
   cash_item_equipment_part: string
   cash_item_equipment_slot: string
@@ -151,4 +173,86 @@ export type EquipmentResponse = {
   item_equipment_preset_2?: Equipment[] | null
   item_equipment_preset_3?: Equipment[] | null
   preset_no?: number | null
+}
+
+export type CharacterStatResponse = {
+  character_class?: string
+  date?: string
+  final_stat?: Array<{
+    stat_name?: string
+    stat_value?: string
+  }>
+  remain_ap?: number
+}
+
+export type SetEffectResponse = {
+  date?: string
+  set_effect?: Array<{
+    set_effect_info?: Array<{
+      set_count?: number
+      set_option?: string
+    }>
+    set_name?: string
+    total_set_count?: number
+  }>
+}
+
+export type AbilityResponse = {
+  ability_grade?: string
+  ability_info?: Array<{
+    ability_grade?: string
+    ability_no?: string
+    ability_value?: string
+  }>
+  ability_preset_1?: AbilityPreset | null
+  ability_preset_2?: AbilityPreset | null
+  ability_preset_3?: AbilityPreset | null
+  date?: string
+  preset_no?: number
+  remain_fame?: number
+}
+
+export type AbilityPreset = {
+  ability_info?: AbilityResponse['ability_info']
+  ability_preset_grade?: string
+}
+
+export type SymbolEquipmentResponse = {
+  date?: string
+  symbol?: Array<{
+    symbol_force?: string
+    symbol_icon?: string
+    symbol_level?: number
+    symbol_name?: string
+  }>
+}
+
+export type LinkSkill = {
+  skill_description?: string
+  skill_level?: number
+  skill_name?: string
+}
+
+export type LinkSkillResponse = {
+  character_link_skill?: LinkSkill[]
+  character_link_skill_preset_1?: LinkSkill[]
+  character_link_skill_preset_2?: LinkSkill[]
+  character_link_skill_preset_3?: LinkSkill[]
+  date?: string
+  preset_no?: number
+}
+
+export type UnionResponse = {
+  date?: string
+  union_grade?: string
+  union_level?: number
+}
+
+export type HexaMatrixResponse = {
+  character_hexa_core_equipment?: Array<{
+    hexa_core_level?: number
+    hexa_core_name?: string
+    hexa_core_type?: string
+  }>
+  date?: string
 }

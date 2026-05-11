@@ -6,6 +6,8 @@ import {
   RequestStatus
 } from '@/api/character.types'
 import { getMapleApiDate } from '@/lib/mapleDate'
+import { queryCacheTime } from '@/lib/queryCache'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 
 const EQUIPMENT_PRESET_NOS = [1, 2, 3] as const
@@ -85,54 +87,23 @@ const createEquipmentState = (
 }
 
 export function useEquipment(ocid: string | undefined) {
-  const [equipmentState, setEquipmentState] = useState<EquipmentState>(
-    createEmptyEquipmentState
-  )
   const [activePresetNo, setActivePresetNo] = useState<
     EquipmentPresetNo | undefined
   >()
-  const [status, setStatus] = useState<RequestStatus>('idle')
+  const date = getMapleApiDate()
+  const query = useQuery({
+    enabled: Boolean(ocid),
+    gcTime: queryCacheTime.characterDailyData.gcTime,
+    queryFn: async () =>
+      createEquipmentState(await getEquipment(ocid || '', date)),
+    queryKey: ['character', 'equipment', ocid, date],
+    staleTime: queryCacheTime.characterDailyData.staleTime
+  })
+  const equipmentState = query.data ?? createEmptyEquipmentState()
 
   useEffect(() => {
-    let ignore = false
-
-    const fetchEqupmentData = async () => {
-      setEquipmentState(createEmptyEquipmentState())
-      setActivePresetNo(undefined)
-
-      if (!ocid) {
-        setStatus('idle')
-        return
-      }
-
-      setStatus('loading')
-
-      try {
-        const equipmentDataResponse = await getEquipment(
-          ocid,
-          getMapleApiDate()
-        )
-
-        if (!ignore) {
-          const nextEquipmentState = createEquipmentState(equipmentDataResponse)
-
-          setEquipmentState(nextEquipmentState)
-          setActivePresetNo(nextEquipmentState.currentPresetNo)
-          setStatus('idle')
-        }
-      } catch {
-        if (!ignore) {
-          setStatus('error')
-        }
-      }
-    }
-
-    fetchEqupmentData()
-
-    return () => {
-      ignore = true
-    }
-  }, [ocid])
+    setActivePresetNo(query.data?.currentPresetNo)
+  }, [query.data?.currentPresetNo])
 
   const equipmentData = activePresetNo
     ? equipmentState.presetEquipmentData[activePresetNo] || []
@@ -151,6 +122,13 @@ export function useEquipment(ocid: string | undefined) {
       equipmentState.presetEquipmentData
     ]
   )
+  const status: RequestStatus = !ocid
+    ? 'idle'
+    : query.isLoading
+      ? 'loading'
+      : query.isError
+        ? 'error'
+        : 'idle'
 
   return {
     equipmentData,

@@ -1,7 +1,8 @@
 import { getOcid } from '@/api/character'
 import { RequestStatus } from '@/api/character.types'
+import { queryCacheTime } from '@/lib/queryCache'
+import { useQuery } from '@tanstack/react-query'
 import { HTTPError } from 'ky'
-import { useEffect, useState } from 'react'
 
 type MapleApiErrorBody = {
   error?: {
@@ -32,45 +33,29 @@ async function getCharacterLookupErrorMessage(error: unknown) {
 }
 
 export function useCharacterOcid(nickname: string | undefined) {
-  const [ocid, setOcid] = useState<string | undefined>()
-  const [status, setStatus] = useState<RequestStatus>('idle')
-  const [errorMessage, setErrorMessage] = useState('')
-
-  useEffect(() => {
-    let ignore = false
-
-    const fetchOcidData = async () => {
-      setOcid(undefined)
-      setErrorMessage('')
-
-      if (!nickname) {
-        setStatus('idle')
-        return
-      }
-
-      setStatus('loading')
-
+  const normalizedNickname = nickname?.trim()
+  const query = useQuery({
+    enabled: Boolean(normalizedNickname),
+    queryFn: async () => {
       try {
-        const response = await getOcid(nickname)
-
-        if (!ignore) {
-          setOcid(response.ocid)
-          setStatus('idle')
-        }
+        const response = await getOcid(normalizedNickname || '')
+        return response.ocid
       } catch (error) {
-        if (!ignore) {
-          setStatus('error')
-          setErrorMessage(await getCharacterLookupErrorMessage(error))
-        }
+        throw new Error(await getCharacterLookupErrorMessage(error))
       }
-    }
+    },
+    gcTime: queryCacheTime.ocid.gcTime,
+    queryKey: ['character', 'ocid', normalizedNickname],
+    staleTime: queryCacheTime.ocid.staleTime
+  })
+  const status: RequestStatus = !normalizedNickname
+    ? 'idle'
+    : query.isLoading
+      ? 'loading'
+      : query.isError
+        ? 'error'
+        : 'idle'
+  const errorMessage = query.error instanceof Error ? query.error.message : ''
 
-    fetchOcidData()
-
-    return () => {
-      ignore = true
-    }
-  }, [nickname])
-
-  return { errorMessage, ocid, status }
+  return { errorMessage, ocid: query.data, status }
 }

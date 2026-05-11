@@ -1,7 +1,8 @@
 import { getChar } from '@/api/character'
 import { CharacterBasic, RequestStatus } from '@/api/character.types'
 import { getMapleApiDate } from '@/lib/mapleDate'
-import { useEffect, useState } from 'react'
+import { queryCacheTime } from '@/lib/queryCache'
+import { useQuery } from '@tanstack/react-query'
 
 export const initialCharacterBasic: CharacterBasic = {
   character_class: '',
@@ -18,44 +19,21 @@ export const initialCharacterBasic: CharacterBasic = {
 }
 
 export function useCharacterBasic(ocid: string | undefined) {
-  const [basicData, setBasicData] = useState<CharacterBasic>(
-    initialCharacterBasic
-  )
-  const [status, setStatus] = useState<RequestStatus>('idle')
+  const date = getMapleApiDate()
+  const query = useQuery({
+    enabled: Boolean(ocid),
+    gcTime: queryCacheTime.characterDailyData.gcTime,
+    queryFn: () => getChar(ocid || '', date),
+    queryKey: ['character', 'basic', ocid, date],
+    staleTime: queryCacheTime.characterDailyData.staleTime
+  })
+  const status: RequestStatus = !ocid
+    ? 'idle'
+    : query.isLoading
+      ? 'loading'
+      : query.isError
+        ? 'error'
+        : 'idle'
 
-  useEffect(() => {
-    let ignore = false
-
-    const fetchData = async () => {
-      setBasicData(initialCharacterBasic)
-
-      if (!ocid) {
-        setStatus('idle')
-        return
-      }
-
-      setStatus('loading')
-
-      try {
-        const basicInfoResponse = await getChar(ocid, getMapleApiDate())
-
-        if (!ignore) {
-          setBasicData(basicInfoResponse)
-          setStatus('idle')
-        }
-      } catch {
-        if (!ignore) {
-          setStatus('error')
-        }
-      }
-    }
-
-    fetchData()
-
-    return () => {
-      ignore = true
-    }
-  }, [ocid])
-
-  return { basicData, status }
+  return { basicData: query.data ?? initialCharacterBasic, status }
 }
