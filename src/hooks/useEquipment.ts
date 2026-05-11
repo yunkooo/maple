@@ -1,6 +1,6 @@
 import { getEquipment } from '@/api/character'
 import { Equipment, RequestStatus } from '@/api/character.types'
-import { getDate } from '@/lib/date'
+import { getMapleApiDate } from '@/lib/mapleDate'
 import { useEffect, useState } from 'react'
 
 export function useEquipment(ocid: string | undefined) {
@@ -21,7 +21,10 @@ export function useEquipment(ocid: string | undefined) {
       setStatus('loading')
 
       try {
-        const equipmentDataResponse = await getEquipment(ocid, getDate())
+        const equipmentDataResponse = await getEquipment(
+          ocid,
+          getMapleApiDate()
+        )
 
         if (!ignore) {
           setEquipmentData(equipmentDataResponse.item_equipment || [])

@@ -1,6 +1,6 @@
 import { useCharacterBasic } from '@/hooks/useCharacterBasic'
 import { BadgeCheck, Shield, Sparkles, Swords } from 'lucide-react'
-import CashSummary from './CashSummary'
+import CashEquipmentSummary from './CashEquipmentSummary'
 
 type Props = {
   ocid: string | undefined
@@ -89,7 +89,7 @@ export default function CharacterProfile({ ocid = '' }: Props) {
             </div>
           </div>
         </div>
-        <CashSummary ocid={ocid} />
+        <CashEquipmentSummary ocid={ocid} />
       </div>
     </section>
   )

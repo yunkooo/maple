@@ -1,5 +1,5 @@
 import { CashEquipmentResponse, CashItem } from '@/api/character.types'
-import { useCashInfo } from '@/hooks/useCashInfo'
+import { useCashEquipment } from '@/hooks/useCashEquipment'
 import { Shirt } from 'lucide-react'
 
 type PresetNumber = 1 | 2 | 3
@@ -8,8 +8,8 @@ type Props = {
   ocid: string | undefined
 }
 
-export default function CashSummary({ ocid }: Props) {
-  const { beautyData, cashData, status } = useCashInfo(ocid)
+export default function CashEquipmentSummary({ ocid }: Props) {
+  const { beautyData, cashData, status } = useCashEquipment(ocid)
 
   function getNowCashData(cashData: CashEquipmentResponse | null) {
     if (cashData !== null) {

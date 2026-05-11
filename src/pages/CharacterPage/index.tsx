@@ -1,5 +1,5 @@
 import CharacterInfo from '@/components/character/CharacterInfo'
 
-export default function InfoPage() {
+export default function CharacterPage() {
   return <CharacterInfo />
 }

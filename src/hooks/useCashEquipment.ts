@@ -4,10 +4,10 @@ import {
   CashEquipmentResponse,
   RequestStatus
 } from '@/api/character.types'
-import { getDate } from '@/lib/date'
+import { getMapleApiDate } from '@/lib/mapleDate'
 import { useEffect, useState } from 'react'
 
-export function useCashInfo(ocid: string | undefined) {
+export function useCashEquipment(ocid: string | undefined) {
   const [cashData, setCashData] = useState<CashEquipmentResponse | null>(null)
   const [beautyData, setBeautyData] = useState<BeautyEquipmentResponse | null>(
     null
@@ -30,8 +30,8 @@ export function useCashInfo(ocid: string | undefined) {
 
       try {
         const [cashResponse, beautyResponse] = await Promise.all([
-          getCashItem(ocid, getDate()),
-          getBeauty(ocid, getDate())
+          getCashItem(ocid, getMapleApiDate()),
+          getBeauty(ocid, getMapleApiDate())
         ])
 
         if (!ignore) {

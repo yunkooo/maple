@@ -1,6 +1,6 @@
 import { getChar } from '@/api/character'
 import { CharacterBasic, RequestStatus } from '@/api/character.types'
-import { getDate } from '@/lib/date'
+import { getMapleApiDate } from '@/lib/mapleDate'
 import { useEffect, useState } from 'react'
 
 export const initialCharacterBasic: CharacterBasic = {
@@ -37,7 +37,7 @@ export function useCharacterBasic(ocid: string | undefined) {
       setStatus('loading')
 
       try {
-        const basicInfoResponse = await getChar(ocid, getDate())
+        const basicInfoResponse = await getChar(ocid, getMapleApiDate())
 
         if (!ignore) {
           setBasicData(basicInfoResponse)

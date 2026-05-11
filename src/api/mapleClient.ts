@@ -1,7 +1,7 @@
 import ky from 'ky'
 
-const instance = ky.create({
+const mapleClient = ky.create({
   prefixUrl: import.meta.env.VITE_API_URL
 })
 
-export default instance
+export default mapleClient

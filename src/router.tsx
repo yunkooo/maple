@@ -1,14 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom'
-import IndexPage from './pages/IndexPage'
-import InfoPage from './pages/InfoPage'
+import AppLayout from './pages/AppLayout'
+import CharacterPage from './pages/CharacterPage'
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <IndexPage />,
+    element: <AppLayout />,
     children: [
       {
         path: '/:nickname',
-        element: <InfoPage />
+        element: <CharacterPage />
       }
     ]
   }

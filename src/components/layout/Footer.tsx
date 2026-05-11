@@ -1,4 +1,4 @@
-import github from '@/asset/github-mark.svg'
+import github from '@/assets/github-mark.svg'
 
 export default function Footer() {
   return (

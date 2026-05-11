@@ -1,4 +1,4 @@
-export const getDate = () => {
+export const getMapleApiDate = () => {
   const nowDate = new Date()
   const prevDate = new Date(nowDate.setDate(nowDate.getDate() - 2))
 
