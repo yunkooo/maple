@@ -14,9 +14,6 @@ import {
   UpdateNoticeListResponse
 } from './notice.types'
 
-export const NOTICE_REFRESH_POLICY_TEXT =
-  'NEXON Open API로 크롤링한 공지 데이터는 30일 이내에 갱신해야 합니다.'
-
 type NoticeEndpointConfig = {
   responseKey: string
   sourceLabel: NoticeSourceLabel
@@ -192,7 +189,6 @@ export const getDashboardNotices = async (): Promise<NoticeCollection> => {
   ).sort((left, right) => getNoticeTimestamp(right) - getNoticeTimestamp(left))
 
   return {
-    notices,
-    refreshPolicyText: NOTICE_REFRESH_POLICY_TEXT
+    notices
   }
 }

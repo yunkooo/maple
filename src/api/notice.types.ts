@@ -62,11 +62,9 @@ export type DashboardNotice = {
 
 export type NoticeCollection = {
   notices: DashboardNotice[]
-  refreshPolicyText: string
 }
 
 export type UseNoticesResult = NoticeCollection & {
   errorMessage: string
-  refreshedAt: string | null
   status: NoticeRequestStatus
 }

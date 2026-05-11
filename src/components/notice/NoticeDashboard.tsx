@@ -4,7 +4,6 @@ import {
   CalendarDays,
   Megaphone,
   PackageOpen,
-  RefreshCw,
   Sparkles,
   Store,
   Wrench
@@ -31,8 +30,6 @@ export type NoticeDashboardNotice = {
 export type NoticeDashboardProps = {
   errorMessage?: string
   notices?: NoticeDashboardNotice[]
-  refreshedAt?: Date | string | null
-  refreshPolicyText?: string
   status?: NoticeDashboardStatus
 }
 
@@ -509,7 +506,7 @@ function NoticeCategorySection({
               </span>
             </div>
             <h3 className="mt-3 text-lg font-black tracking-normal text-foreground">
-              {meta.label} 모아보기
+              {meta.label}
             </h3>
             <p className="mt-1 text-sm leading-5 text-muted-foreground">
               {meta.description}
@@ -579,35 +576,21 @@ function NoticeCategorySection({
 export default function NoticeDashboard({
   errorMessage,
   notices = [],
-  refreshedAt,
-  refreshPolicyText = '공지 데이터는 캐시 상태에 따라 주기적으로 갱신됩니다.',
   status = 'success'
 }: NoticeDashboardProps) {
-  const refreshedAtText = formatDisplayDate(refreshedAt)
-
   return (
     <section
       className="rounded-lg border border-border bg-card p-4 shadow-sm md:p-5"
       aria-busy={status === 'loading'}>
-      <div className="flex flex-col gap-4 border-b border-border pb-4 md:flex-row md:items-start md:justify-between">
+      <div className="border-b border-border pb-4">
         <div className="min-w-0">
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-200">
             <Megaphone className="h-3.5 w-3.5" />
             메이플스토리 소식
           </div>
           <h2 className="mt-3 text-2xl font-black tracking-normal text-foreground">
-            공지/이벤트 대시보드
+            공지/이벤트
           </h2>
-        </div>
-        <div className="rounded-lg border border-border bg-background/70 p-3 text-xs text-muted-foreground dark:bg-white/5 md:min-w-[220px]">
-          <div className="flex items-center gap-2 font-bold text-foreground">
-            <RefreshCw className="h-3.5 w-3.5" />
-            갱신 정보
-          </div>
-          <p className="mt-2 leading-5">{refreshPolicyText}</p>
-          <p className="mt-2 font-semibold">
-            최근 갱신 {refreshedAtText || '-'}
-          </p>
         </div>
       </div>
 

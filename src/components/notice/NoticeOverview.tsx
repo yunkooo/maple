@@ -82,13 +82,7 @@ const isNewNotice = (date: string) => {
 }
 
 export default function NoticeOverview() {
-  const {
-    errorMessage,
-    notices,
-    refreshedAt,
-    refreshPolicyText,
-    status: noticeStatus
-  } = useNotices()
+  const { errorMessage, notices, status: noticeStatus } = useNotices()
   const noticeDashboardStatus: NoticeDashboardStatus =
     noticeStatus === 'idle' ? 'success' : noticeStatus
   const dashboardNotices: NoticeDashboardNotice[] = notices.map(notice => {
@@ -111,8 +105,6 @@ export default function NoticeOverview() {
     <NoticeDashboard
       errorMessage={errorMessage}
       notices={dashboardNotices}
-      refreshedAt={refreshedAt}
-      refreshPolicyText={refreshPolicyText}
       status={noticeDashboardStatus}
     />
   )

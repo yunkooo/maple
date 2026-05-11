@@ -1,4 +1,4 @@
-import { getDashboardNotices, NOTICE_REFRESH_POLICY_TEXT } from '@/api/notice'
+import { getDashboardNotices } from '@/api/notice'
 import {
   DashboardNotice,
   NoticeRequestStatus,
@@ -56,15 +56,10 @@ export function useNotices(): UseNoticesResult {
       : 'idle'
   const errorMessage = query.error instanceof Error ? query.error.message : ''
   const notices: DashboardNotice[] = query.data?.notices ?? []
-  const refreshedAt = query.dataUpdatedAt
-    ? new Date(query.dataUpdatedAt).toISOString()
-    : null
 
   return {
     errorMessage,
     notices,
-    refreshPolicyText: NOTICE_REFRESH_POLICY_TEXT,
-    refreshedAt,
     status
   }
 }
