@@ -1,7 +1,6 @@
 import type { CashItem } from '@/api/character.types'
 import { useCashEquipment } from '@/hooks/useCashEquipment'
-import { useCharacterBasic } from '@/hooks/useCharacterBasic'
-import { Grid2X2, List, Shirt } from 'lucide-react'
+import { Check, Shirt } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import {
   CASH_PRESET_NUMBERS,
@@ -28,40 +27,8 @@ const CODY_SLOT_COLUMNS = [
   ['피부', '하의', '귀고리', '무기', '반지3', '반지4']
 ]
 
-const PREVIEW_ITEM_SLOTS = ['모자', '헤어', '얼굴장식', '상의', '무기', '망토']
-
 const getSlotItem = (items: CashItem[], slot: string) =>
   items.find(item => item.cash_item_equipment_slot === slot)
-
-const getPreviewImageUrl = (imageUrl: string) => {
-  if (!imageUrl) {
-    return imageUrl
-  }
-
-  const url = new URL(imageUrl)
-  url.searchParams.set('action', 'A00')
-  url.searchParams.set('emotion', 'E00')
-  url.searchParams.set('width', '220')
-  url.searchParams.set('height', '220')
-  url.searchParams.set('x', '110')
-  url.searchParams.set('y', '160')
-
-  return url.toString()
-}
-
-const getPreviewItems = (items: CashItem[]) => {
-  const slottedItems = PREVIEW_ITEM_SLOTS.flatMap(slot => {
-    const item = getSlotItem(items, slot)
-
-    return item ? [item] : []
-  })
-
-  if (slottedItems.length > 0) {
-    return slottedItems.slice(0, 6)
-  }
-
-  return items.slice(0, 6)
-}
 
 function CodyItemRow({ item, isLoading = false, slotLabel }: CodyCardProps) {
   return (
@@ -111,88 +78,8 @@ function CodyItemRow({ item, isLoading = false, slotLabel }: CodyCardProps) {
   )
 }
 
-function CodyPreviewPanel({
-  activeViewLabel,
-  canUseCharacterImage,
-  imageUrl,
-  previewItems
-}: {
-  activeViewLabel: string
-  canUseCharacterImage: boolean
-  imageUrl: string
-  previewItems: CashItem[]
-}) {
-  return (
-    <div className="mx-auto max-w-4xl rounded-xl border border-pink-200 bg-pink-50/40 p-4 shadow-sm dark:border-pink-300/30 dark:bg-pink-400/10">
-      <div className="grid gap-5 sm:grid-cols-[18rem_minmax(0,1fr)] sm:items-center">
-        <div className="flex h-72 items-end justify-center rounded-lg border border-pink-200/70 bg-background/80 p-3 dark:border-pink-300/20 dark:bg-black/20">
-          {canUseCharacterImage && imageUrl ? (
-            <img
-              className="h-68 w-68 object-contain [image-rendering:pixelated]"
-              src={imageUrl}
-              alt=""
-            />
-          ) : (
-            <div className="flex h-32 w-24 flex-col items-center justify-center rounded-full bg-muted text-center text-xs font-black text-muted-foreground">
-              프리셋
-              <span className="mt-1 text-[11px] font-bold">아이템 기준</span>
-            </div>
-          )}
-        </div>
-        <div className="min-w-0 text-left">
-          <p className="text-xs font-black text-pink-600 dark:text-pink-200">
-            선택한 코디
-          </p>
-          <h3 className="mt-1 text-2xl font-black text-foreground">
-            {activeViewLabel}
-          </h3>
-          <p className="mt-2 text-sm font-medium text-muted-foreground">
-            {canUseCharacterImage
-              ? '적용 중인 모습'
-              : '선택 프리셋 아이템 기준'}
-          </p>
-          <ul className="mt-4 grid grid-cols-3 gap-2">
-            {previewItems.length > 0 ? (
-              previewItems.map(item => (
-                <li
-                  key={`${item.cash_item_equipment_slot}-${item.cash_item_name}`}
-                  className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background/80 p-2 dark:bg-white/5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted/70">
-                    {item.cash_item_icon ? (
-                      <img
-                        className="h-8 w-8 object-contain [image-rendering:pixelated]"
-                        src={item.cash_item_icon}
-                        alt=""
-                      />
-                    ) : (
-                      <Shirt className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-xs font-black text-foreground">
-                      {item.cash_item_name}
-                    </span>
-                    <span className="block truncate text-[11px] font-medium text-muted-foreground">
-                      {item.cash_item_equipment_slot}
-                    </span>
-                  </span>
-                </li>
-              ))
-            ) : (
-              <li className="col-span-3 rounded-lg border border-dashed border-border p-4 text-center text-sm font-bold text-muted-foreground">
-                표시할 코디 아이템이 없습니다.
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function CodySection({ ocid }: Props) {
   const { beautyData, cashData, status } = useCashEquipment(ocid)
-  const { basicData } = useCharacterBasic(ocid)
   const currentPresetNo = getActivePresetNumber(cashData)
   const [activeViewKey, setActiveViewKey] = useState<CodyViewKey>('base')
   const cashItems = useMemo(
@@ -213,12 +100,6 @@ export default function CodySection({ ocid }: Props) {
       ),
     [activeViewKey, cashData]
   )
-  const activeViewLabel =
-    activeViewKey === 'base' ? '기본 코디' : `${activeViewKey}번 프리셋`
-  const previewItems = useMemo(() => getPreviewItems(cashItems), [cashItems])
-  const canUseCharacterImage =
-    activeViewKey === 'base' || activeViewKey === currentPresetNo
-
   useEffect(() => {
     setActiveViewKey('base')
   }, [ocid])
@@ -232,13 +113,6 @@ export default function CodySection({ ocid }: Props) {
             현재 적용된 캐시 장비와 뷰티 정보를 프리셋 기준으로 확인합니다.
           </p>
         </div>
-        <span className="text-xs font-medium text-muted-foreground">
-          {status === 'loading'
-            ? '조회중'
-            : status === 'error'
-              ? '조회 실패'
-              : activeViewLabel}
-        </span>
       </header>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -266,22 +140,13 @@ export default function CodySection({ ocid }: Props) {
             }`}>
             프리셋 {presetNo}
             {currentPresetNo === presetNo && (
-              <span className="ml-1 text-[10px] font-bold">현재</span>
+              <span className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-pink-100 text-pink-700 dark:bg-pink-400/15 dark:text-pink-200">
+                <Check className="h-3 w-3" />
+                <span className="sr-only">현재 적용 프리셋</span>
+              </span>
             )}
           </button>
         ))}
-      </div>
-
-      <div className="space-y-3 text-center">
-        <p className="text-sm font-bold text-muted-foreground">
-          (캐릭터가 인게임 모습과 다를 수 있습니다.)
-        </p>
-        <CodyPreviewPanel
-          activeViewLabel={activeViewLabel}
-          canUseCharacterImage={canUseCharacterImage}
-          imageUrl={getPreviewImageUrl(basicData.character_image)}
-          previewItems={previewItems}
-        />
       </div>
 
       {status === 'error' ? (
@@ -290,17 +155,6 @@ export default function CodySection({ ocid }: Props) {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="flex justify-center gap-2">
-            <button className="inline-flex items-center gap-2 rounded-md bg-muted px-4 py-2 text-sm font-black text-foreground">
-              <List className="h-4 w-4" />
-              목록
-            </button>
-            <button className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-black text-muted-foreground">
-              <Grid2X2 className="h-4 w-4" />
-              장비창
-            </button>
-          </div>
-
           <div className="grid gap-x-8 gap-y-4 md:grid-cols-3">
             {status === 'loading' ? (
               <>

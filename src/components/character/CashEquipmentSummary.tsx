@@ -23,9 +23,9 @@ export default function CashEquipmentSummary({ ocid }: Props) {
   ]
 
   return (
-    <aside className="rounded-lg border border-border/70 bg-background/85 p-4 shadow-sm dark:bg-white/[0.06]">
+    <aside className="rounded-lg border border-border bg-background/85 p-4 shadow-sm dark:bg-white/[0.04]">
       <div className="mb-3 flex items-center gap-2">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 text-pink-600 dark:bg-pink-400/10 dark:text-pink-200">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:bg-white/10">
           <Shirt className="h-4 w-4" />
         </span>
         <div>

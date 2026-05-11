@@ -1,12 +1,5 @@
-import {
-  Bell,
-  Moon,
-  Search,
-  Shirt,
-  Sparkles,
-  Sun,
-  UserRound
-} from 'lucide-react'
+import iconUrl from '@/assets/icon.png'
+import { Bell, Moon, Search, Sun, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
@@ -67,30 +60,12 @@ const getNavigationItems = (nickname: string): NavigationItem[] => {
       to: nickname ? `/${encodedNickname}` : '/',
       icon: UserRound
     },
-    {
-      label: '오늘 리포트',
-      to: nickname ? `/report/${encodedNickname}` : '/report',
-      icon: Sparkles
-    },
-    {
-      label: '코디',
-      to: nickname ? `/cody?nickname=${encodedNickname}` : '/cody',
-      icon: Shirt
-    },
     { label: '공지', to: '/notice', icon: Bell }
   ]
 }
 
-const getSearchTargetPath = (pathname: string, nickname: string) => {
+const getSearchTargetPath = (nickname: string) => {
   const encodedNickname = encodeURIComponent(nickname)
-
-  if (pathname === '/cody') {
-    return `/cody?nickname=${encodedNickname}`
-  }
-
-  if (pathname === '/report' || pathname.startsWith('/report/')) {
-    return `/report/${encodedNickname}`
-  }
 
   return `/${encodedNickname}`
 }
@@ -146,7 +121,7 @@ export default function Header() {
 
       setLastNickname(nickName)
       setStoredNickname(nickName)
-      navigate(getSearchTargetPath(location.pathname, nickName))
+      navigate(getSearchTargetPath(nickName))
     }
   }
 
@@ -156,15 +131,12 @@ export default function Header() {
         <Link
           className="flex shrink-0 items-center gap-2 text-xl font-black tracking-normal text-foreground sm:text-2xl"
           to="/">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground">
-            M
-          </span>
-          <span className="leading-none">
-            Maple Finder
-            <span className="block text-xs font-semibold text-muted-foreground">
-              캐릭터 조회
-            </span>
-          </span>
+          <img
+            className="h-10 w-10 rounded-lg"
+            src={iconUrl}
+            alt=""
+          />
+          <span className="leading-none">Maple Note</span>
         </Link>
         <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:justify-center">
           {navigationItems.map(({ label, to, icon: Icon }) => (

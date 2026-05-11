@@ -1,12 +1,6 @@
 import { useCharacterBasic } from '@/hooks/useCharacterBasic'
 import { useGuildMark } from '@/hooks/useGuildMark'
-import {
-  BadgeCheck,
-  CalendarDays,
-  Shield,
-  Sparkles,
-  Trophy
-} from 'lucide-react'
+import { CalendarDays, Shield, Sparkles, Trophy } from 'lucide-react'
 import CashEquipmentSummary from './CashEquipmentSummary'
 
 type Props = {
@@ -50,28 +44,22 @@ export default function CharacterProfile({ ocid = '' }: Props) {
   ]
 
   return (
-    <section className="overflow-hidden rounded-lg border border-amber-200/70 bg-card shadow-sm dark:border-amber-300/15">
+    <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <header className="sr-only">캐릭터 기본 정보</header>
-      <div className="grid gap-6 bg-[radial-gradient(circle_at_16%_12%,rgba(251,191,36,0.3),transparent_30%),radial-gradient(circle_at_88%_10%,rgba(20,184,166,0.2),transparent_34%),linear-gradient(135deg,rgba(255,251,235,0.92),rgba(240,253,244,0.58)_48%,rgba(255,255,255,0.88))] p-5 dark:bg-[radial-gradient(circle_at_18%_8%,rgba(251,191,36,0.18),transparent_30%),radial-gradient(circle_at_84%_14%,rgba(45,212,191,0.17),transparent_34%),linear-gradient(135deg,rgba(28,25,23,0.98),rgba(17,24,39,0.94)_48%,rgba(15,23,42,0.98))] md:grid-cols-[minmax(260px,320px)_1fr_280px] md:items-center md:p-6">
-        <div className="relative flex min-h-[280px] items-end justify-center overflow-hidden rounded-lg border border-amber-200/80 bg-gradient-to-b from-sky-100/90 via-emerald-50/90 to-amber-100/90 p-4 shadow-inner dark:border-amber-300/15 dark:from-slate-900/80 dark:via-emerald-950/40 dark:to-stone-900/90 md:min-h-[320px]">
-          <div className="absolute bottom-7 h-10 w-48 rounded-full bg-amber-300/45 blur-sm dark:bg-amber-300/20" />
-          <div className="absolute bottom-9 h-4 w-40 rounded-full border border-amber-300/70 bg-white/55 dark:border-amber-200/20 dark:bg-white/10" />
-          <div className="relative z-10 flex h-64 w-64 items-center justify-center sm:h-72 sm:w-72">
+      <div className="grid gap-6 bg-muted/20 p-5 dark:bg-white/[0.025] md:grid-cols-[minmax(260px,320px)_1fr_280px] md:items-center md:p-6">
+        <div className="relative flex min-h-[340px] items-end justify-center overflow-hidden rounded-lg border border-border bg-background p-4 shadow-inner dark:bg-white/[0.035] md:min-h-[390px]">
+          <div className="relative z-10 flex h-80 w-80 items-center justify-center sm:h-96 sm:w-96">
             {basicData.character_image ? (
               <img
-                className="h-56 w-56 scale-[1.45] object-contain drop-shadow-[0_22px_30px_rgba(15,23,42,0.28)] [image-rendering:pixelated] sm:h-60 sm:w-60 md:scale-[1.38]"
+                className="h-72 w-72 scale-[1.68] object-contain drop-shadow-[0_24px_32px_rgba(15,23,42,0.24)] [image-rendering:pixelated] sm:h-80 sm:w-80 md:scale-[1.62]"
                 src={basicData.character_image}
                 alt={basicData.character_name || '캐릭터 이미지'}
               />
             ) : (
-              <div className="flex h-40 w-40 items-center justify-center rounded-lg border border-dashed border-amber-300/70 bg-white/50 text-sm font-bold text-muted-foreground dark:bg-white/5">
+              <div className="flex h-40 w-40 items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-sm font-bold text-muted-foreground dark:bg-white/5">
                 {status === 'loading' ? '이미지 조회 중' : '이미지 없음'}
               </div>
             )}
-          </div>
-          <div className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-white/80 px-3 py-1 text-xs font-bold text-amber-800 shadow-sm dark:border-amber-300/20 dark:bg-white/10 dark:text-amber-100">
-            <BadgeCheck className="h-3.5 w-3.5" />
-            {status === 'error' ? '조회 실패' : worldName}
           </div>
         </div>
         <div className="min-w-0 space-y-5">
@@ -81,7 +69,7 @@ export default function CharacterProfile({ ocid = '' }: Props) {
                 <Sparkles className="h-3.5 w-3.5" />
                 {className}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs font-bold text-muted-foreground dark:bg-white/5">
                 <Trophy className="h-3.5 w-3.5" />
                 {levelText}
               </span>
@@ -94,11 +82,11 @@ export default function CharacterProfile({ ocid = '' }: Props) {
           <div className="grid gap-2 sm:grid-cols-2">
             {summaryItems.map(item => (
               <div
-                className="rounded-lg border border-white/70 bg-white/70 p-3 shadow-sm dark:border-white/10 dark:bg-white/[0.06]"
+                className="rounded-lg border border-border bg-background/80 p-3 shadow-sm dark:bg-white/[0.04]"
                 key={item.label}>
                 <div className="flex min-w-0 items-center gap-3">
                   {item.imageUrl ? (
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-emerald-200/80 bg-white/85 shadow-sm dark:border-emerald-300/20 dark:bg-white/10">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-background shadow-sm dark:bg-white/10">
                       <img
                         alt={`${item.value} 길드 마크`}
                         className="h-8 w-8 object-contain [image-rendering:pixelated]"
@@ -121,19 +109,19 @@ export default function CharacterProfile({ ocid = '' }: Props) {
             ))}
           </div>
 
-          <div className="rounded-lg border border-white/70 bg-white/75 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.06]">
+          <div className="rounded-lg border border-border bg-background/80 p-4 shadow-sm dark:bg-white/[0.04]">
             <div className="mb-2 flex items-center justify-between gap-3 text-sm">
               <span className="inline-flex items-center gap-2 font-black text-foreground">
                 <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
                 다음 레벨 경험치
               </span>
-              <span className="font-black text-amber-700 dark:text-amber-200">
+              <span className="font-black text-emerald-700 dark:text-emerald-200">
                 {expText}
               </span>
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-amber-100 shadow-inner dark:bg-slate-800">
+            <div className="h-3 overflow-hidden rounded-full bg-muted shadow-inner dark:bg-slate-800">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-300 via-emerald-300 to-cyan-300 shadow-[0_0_12px_rgba(16,185,129,0.32)]"
+                className="h-full rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.22)]"
                 style={{ width: expWidth }}></div>
             </div>
             <div className="mt-2 flex items-center gap-1 text-xs font-medium text-muted-foreground">
