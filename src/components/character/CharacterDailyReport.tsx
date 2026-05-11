@@ -3,47 +3,52 @@ import { useCashEquipment } from '@/hooks/useCashEquipment'
 import { useCharacterBasic } from '@/hooks/useCharacterBasic'
 import { useEquipment } from '@/hooks/useEquipment'
 import {
-  BadgeCheck,
-  CalendarCheck,
-  ClipboardList,
+  cautionPoints,
+  codyPointMessages,
+  dailyFortunes,
+  formatDailyReportTemplate,
+  getStableHash,
+  luckyEquipmentMessages,
+  luckyKeywords,
+  luckyTimes,
+  pickDailyItem
+} from '@/lib/dailyReportFortune'
+import {
+  generateCharacterNicknames,
+  getNicknameStyleLabel,
+  NicknameStyle
+} from '@/lib/nicknameGenerator'
+import {
+  Clock3,
+  Compass,
   Gauge,
-  Gem,
   Palette,
-  Shirt,
   Sparkles,
   Star,
-  Swords,
-  Target,
-  TrendingUp
+  Target
 } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { getActiveCashItems } from './cody.utils'
 
 type Props = {
   ocid: string | undefined
 }
 
-type ReportMetric = {
-  icon: typeof Sparkles
-  label: string
-  value: string
-  tone: string
-}
-
-type ReportAction = {
-  badge: string
-  description: string
-  icon: typeof ClipboardList
-  tone: string
-  title: string
-}
-
 type ReportHighlight = {
   description: string
-  icon: typeof Gem
+  icon: typeof Sparkles
   label: string
   tone: string
   value: string
 }
+
+const nicknameStyles: NicknameStyle[] = [
+  'random',
+  'cool',
+  'cute',
+  'dark',
+  'boss'
+]
 
 const getStarforce = (starforce?: string) =>
   Number.parseInt(starforce || '0', 10) || 0
@@ -99,6 +104,24 @@ const getReportScore = ({
   return Math.min(100, levelScore + equipmentScore + starforceScore + codyScore)
 }
 
+const getKoreanDateKey = () => {
+  const parts = new Intl.DateTimeFormat('ko-KR', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: 'Asia/Seoul',
+    year: 'numeric'
+  }).formatToParts(new Date())
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find(part => part.type === type)?.value || ''
+
+  return `${getPart('year')}-${getPart('month')}-${getPart('day')}`
+}
+
+const getDailyFortune = (seed: string) => pickDailyItem(dailyFortunes, seed)
+
+const getSignedNumberLabel = (value: number) =>
+  value > 0 ? `+${value}` : `${value}`
+
 const getReportKeyword = (score: number, totalStarforce: number) => {
   if (score >= 85) {
     return '오늘 준비도 높음'
@@ -115,22 +138,21 @@ const getReportKeyword = (score: number, totalStarforce: number) => {
   return '기본 정보 수집 중'
 }
 
-const getTopStarEquipment = (equipmentData: Equipment[]) =>
-  equipmentData.reduce<Equipment | null>((selectedEquipment, equipment) => {
-    if (!selectedEquipment) {
-      return equipment
-    }
+const getLuckyEquipment = (equipmentData: Equipment[], seed: string) => {
+  const namedEquipment = equipmentData.filter(equipment => equipment.item_name)
 
-    return getStarforce(equipment.starforce) >
-      getStarforce(selectedEquipment.starforce)
-      ? equipment
-      : selectedEquipment
-  }, null)
+  if (namedEquipment.length === 0) {
+    return null
+  }
+
+  return namedEquipment[getStableHash(seed) % namedEquipment.length]
+}
 
 export default function CharacterDailyReport({ ocid }: Props) {
   const { basicData, status: basicStatus } = useCharacterBasic(ocid)
   const { equipmentData, status: equipmentStatus } = useEquipment(ocid)
   const { beautyData, cashData, status: cashStatus } = useCashEquipment(ocid)
+  const [nicknameStyle, setNicknameStyle] = useState<NicknameStyle>('random')
   const status = getReportStatus(basicStatus, equipmentStatus, cashStatus)
   const activeCashItems = getActiveCashItems(cashData)
   const level = basicData.character_level || 0
@@ -138,15 +160,49 @@ export default function CharacterDailyReport({ ocid }: Props) {
     (total, item) => total + getStarforce(item.starforce),
     0
   )
-  const reportScore = getReportScore({
+  const baseReportScore = getReportScore({
     activeCashItemCount: activeCashItems.length,
     equipmentCount: equipmentData.length,
     level,
     totalStarforce
   })
+  const dailyDateKey = getKoreanDateKey()
+  const dailyFortune = useMemo(
+    () =>
+      getDailyFortune(
+        `${dailyDateKey}:${ocid || basicData.character_name || 'guest'}`
+      ),
+    [basicData.character_name, dailyDateKey, ocid]
+  )
+  const reportScore =
+    status === 'loading'
+      ? baseReportScore
+      : Math.min(100, Math.max(0, baseReportScore + dailyFortune.boost))
   const reportScoreWidth = `${reportScore}%`
-  const topStarEquipment = getTopStarEquipment(equipmentData)
-  const topStarforce = getStarforce(topStarEquipment?.starforce)
+  const luckyEquipment = getLuckyEquipment(
+    equipmentData,
+    `${dailyDateKey}:${dailyFortune.label}:${ocid || basicData.character_name || 'guest'}`
+  )
+  const luckyTime = pickDailyItem(
+    luckyTimes,
+    `${dailyDateKey}:time:${ocid || basicData.character_name || 'guest'}`
+  )
+  const luckyKeyword = pickDailyItem(
+    luckyKeywords,
+    `${dailyDateKey}:keyword:${ocid || basicData.character_name || 'guest'}`
+  )
+  const cautionPoint = pickDailyItem(
+    cautionPoints,
+    `${dailyDateKey}:caution:${ocid || basicData.character_name || 'guest'}`
+  )
+  const luckyEquipmentMessageTemplate = pickDailyItem(
+    luckyEquipmentMessages,
+    `${dailyDateKey}:equipment-message:${ocid || basicData.character_name || 'guest'}`
+  )
+  const codyPointMessageTemplate = pickDailyItem(
+    codyPointMessages,
+    `${dailyDateKey}:cody-message:${ocid || basicData.character_name || 'guest'}`
+  )
   const reportKeyword = getReportKeyword(reportScore, totalStarforce)
   const reportTitle =
     status === 'loading'
@@ -159,81 +215,35 @@ export default function CharacterDailyReport({ ocid }: Props) {
       ? '캐릭터 기본 정보, 장비, 코디 데이터를 모으고 있습니다.'
       : status === 'error'
         ? 'Nexon API 응답 중 일부가 실패했습니다. 잠시 후 다시 조회하면 리포트가 채워질 수 있어요.'
-        : `${getLevelMood(level)}입니다. 오늘은 성장 점검, 대표 장비, 코디 무드를 한 번에 훑기 좋은 날이에요.`
-
-  const metrics: ReportMetric[] = [
-    {
-      icon: TrendingUp,
-      label: '성장 구간',
-      tone: 'text-emerald-700 dark:text-emerald-200',
-      value: level ? getLevelMood(level) : '정보 없음'
-    },
-    {
-      icon: BadgeCheck,
-      label: '장비 확인도',
-      tone: 'text-amber-700 dark:text-amber-200',
-      value:
-        status === 'loading' ? '-' : `${equipmentData.length}개 장비 확인됨`
-    },
-    {
-      icon: Star,
-      label: '총 스타포스',
-      tone: 'text-sky-700 dark:text-sky-200',
-      value: status === 'loading' ? '-' : `${totalStarforce}`
-    },
-    {
-      icon: Shirt,
-      label: '코디 프리셋',
-      tone: 'text-pink-700 dark:text-pink-200',
-      value: status === 'loading' ? '-' : `${activeCashItems.length}개 아이템`
-    }
-  ]
-
-  const actions: ReportAction[] = [
-    {
-      badge: '1',
-      description:
-        equipmentData.length >= 20
-          ? '장비가 충분히 조회됐어요. 잠재 옵션과 스타포스가 낮은 부위부터 비교해 보세요.'
-          : '장비 정보가 적게 잡혔어요. 장착 장비가 모두 조회되는지 먼저 확인해 보세요.',
-      icon: Swords,
-      tone: 'bg-sky-50 text-sky-700 dark:bg-sky-400/10 dark:text-sky-200',
-      title: '장비 상태 점검'
-    },
-    {
-      badge: '2',
-      description: beautyData
-        ? `${beautyData.character_hair.hair_name}, ${beautyData.character_face.face_name} 조합이에요. 명함 카드에 코디 무드를 붙이기 좋아요.`
-        : '헤어와 성형 정보를 불러오면 캐릭터 명함에 코디 무드를 붙일 수 있어요.',
-      icon: Shirt,
-      tone: 'bg-pink-50 text-pink-700 dark:bg-pink-400/10 dark:text-pink-200',
-      title: '코디 무드 확인'
-    },
-    {
-      badge: '3',
-      description:
-        level >= 260
-          ? '고레벨 구간이라 이벤트 보상, 심볼, 장비 성장 재료 공지를 우선 확인하는 구성이 잘 맞아요.'
-          : '성장 구간이라 레벨업 이벤트와 경험치 관련 공지를 먼저 보여주면 좋아요.',
-      icon: CalendarCheck,
-      tone: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200',
-      title: '오늘 볼 공지 추천'
-    }
-  ]
-
+        : `${getLevelMood(level)}입니다. 오늘 운세는 ${dailyFortune.label}. ${dailyFortune.message}`
+  const generatedNicknames = useMemo(
+    () =>
+      generateCharacterNicknames({
+        basic: basicData,
+        cashItems: activeCashItems,
+        equipment: equipmentData,
+        style: nicknameStyle
+      }),
+    [activeCashItems, basicData, equipmentData, nicknameStyle]
+  )
   const highlights: ReportHighlight[] = [
     {
-      description: topStarEquipment
-        ? `${topStarforce}성 · ${topStarEquipment.item_equipment_part || '장비'}`
-        : '장비 데이터를 불러오면 가장 높은 스타포스 장비가 표시됩니다.',
-      icon: Gem,
-      label: '오늘의 대표 장비',
+      description: luckyEquipment
+        ? formatDailyReportTemplate(luckyEquipmentMessageTemplate, {
+            fortune: dailyFortune.label,
+            item: luckyEquipment.item_name || '행운 장비'
+          })
+        : '장비 데이터를 불러오면 오늘의 행운 장비가 표시됩니다.',
+      icon: Sparkles,
+      label: '오늘의 행운 장비',
       tone: 'border-amber-200 bg-amber-50/75 text-amber-800 dark:border-amber-300/20 dark:bg-amber-400/10 dark:text-amber-100',
-      value: topStarEquipment?.item_name || '장비 분석 대기'
+      value: luckyEquipment?.item_name || '행운 장비 대기'
     },
     {
       description: beautyData
-        ? `${beautyData.character_face.face_name}와 잘 어울리는 오늘의 코디 포인트입니다.`
+        ? formatDailyReportTemplate(codyPointMessageTemplate, {
+            hair: beautyData.character_hair.hair_name || '오늘의 헤어'
+          })
         : '뷰티 데이터를 불러오면 헤어와 성형 조합이 표시됩니다.',
       icon: Palette,
       label: '오늘의 코디 포인트',
@@ -241,11 +251,10 @@ export default function CharacterDailyReport({ ocid }: Props) {
       value: beautyData?.character_hair.hair_name || '코디 분석 대기'
     }
   ]
-
   return (
     <section className="space-y-5">
       <div className="overflow-hidden rounded-lg border border-emerald-200/70 bg-card shadow-sm dark:border-emerald-300/15">
-        <div className="grid gap-5 bg-[linear-gradient(135deg,rgba(236,253,245,0.95),rgba(255,251,235,0.88)_48%,rgba(248,250,252,0.95))] p-5 dark:bg-[linear-gradient(135deg,rgba(6,78,59,0.35),rgba(68,64,60,0.24)_48%,rgba(15,23,42,0.98))] lg:grid-cols-[1fr_240px]">
+        <div className="bg-[linear-gradient(135deg,rgba(236,253,245,0.95),rgba(255,251,235,0.88)_48%,rgba(248,250,252,0.95))] p-5 dark:bg-[linear-gradient(135deg,rgba(6,78,59,0.35),rgba(68,64,60,0.24)_48%,rgba(15,23,42,0.98))]">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <p className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/75 px-3 py-1 text-sm font-black text-emerald-700 shadow-sm dark:border-emerald-300/20 dark:bg-white/10 dark:text-emerald-200">
@@ -272,6 +281,11 @@ export default function CharacterDailyReport({ ocid }: Props) {
                   <p className="mt-1 text-2xl font-black text-foreground">
                     {status === 'loading' ? '-' : `${reportScore}점`}
                   </p>
+                  {status !== 'loading' && (
+                    <p className="mt-1 text-xs font-bold text-muted-foreground">
+                      기본 {baseReportScore}점 → 운세 적용 {reportScore}점
+                    </p>
+                  )}
                 </div>
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
                   <Gauge className="h-5 w-5" />
@@ -285,46 +299,72 @@ export default function CharacterDailyReport({ ocid }: Props) {
                   }}
                 />
               </div>
-            </div>
-          </div>
-
-          <div className="relative flex min-h-[220px] items-end justify-center overflow-hidden rounded-lg border border-white/70 bg-white/60 p-4 shadow-inner dark:border-white/10 dark:bg-white/[0.055]">
-            <div className="absolute bottom-5 h-10 w-40 rounded-full bg-amber-300/35 blur-sm dark:bg-amber-300/15" />
-            {basicData.character_image ? (
-              <img
-                className="relative z-10 h-44 w-44 scale-125 object-contain drop-shadow-[0_16px_24px_rgba(15,23,42,0.25)] [image-rendering:pixelated]"
-                src={basicData.character_image}
-                alt={basicData.character_name || '캐릭터 이미지'}
-              />
-            ) : (
-              <div className="relative z-10 flex h-32 w-32 items-center justify-center rounded-lg border border-dashed border-border bg-background/80 text-sm font-bold text-muted-foreground">
-                이미지 대기
+              <div
+                className={`mt-3 rounded-lg border px-3 py-2 ${dailyFortune.tone}`}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="inline-flex items-center gap-1.5 text-xs font-black">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    오늘 운세
+                  </p>
+                  <span className="rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-black text-current shadow-sm dark:bg-white/10">
+                    준비도 {getSignedNumberLabel(dailyFortune.boost)}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-black">{dailyFortune.label}</p>
+                <p className="mt-1 text-xs font-bold leading-5 opacity-80">
+                  {dailyFortune.message}
+                </p>
+                <p className="mt-2 rounded-md bg-white/55 px-2 py-1 text-xs font-black leading-5 opacity-90 dark:bg-white/10">
+                  {dailyFortune.scoreHint}
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-3 border-t border-border bg-background/55 p-4 dark:bg-white/[0.025] sm:grid-cols-2 xl:grid-cols-4">
-          {metrics.map(metric => {
-            const Icon = metric.icon
-
-            return (
-              <div
-                className="rounded-lg border border-border bg-background/80 p-3 shadow-sm dark:bg-white/[0.04]"
-                key={metric.label}>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-bold text-muted-foreground">
-                    {metric.label}
-                  </p>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <p
-                  className={`mt-2 truncate text-lg font-black ${metric.tone}`}>
-                  {metric.value}
-                </p>
-              </div>
-            )
-          })}
+        <div className="grid gap-3 border-t border-border bg-background/55 p-4 dark:bg-white/[0.025] md:grid-cols-3">
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 p-4 shadow-sm dark:border-emerald-300/20 dark:bg-emerald-400/10">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-black text-emerald-700 dark:text-emerald-100">
+                행운 시간
+              </p>
+              <Clock3 className="h-4 w-4 text-emerald-600 dark:text-emerald-200" />
+            </div>
+            <p className="mt-2 text-lg font-black text-foreground">
+              {luckyTime}
+            </p>
+            <p className="mt-1 text-xs font-bold leading-5 text-muted-foreground">
+              무언가 하나를 시작하기 좋은 리듬입니다.
+            </p>
+          </div>
+          <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-4 shadow-sm dark:border-amber-300/20 dark:bg-amber-400/10">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-black text-amber-700 dark:text-amber-100">
+                행운 키워드
+              </p>
+              <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-200" />
+            </div>
+            <p className="mt-2 text-lg font-black text-foreground">
+              {luckyKeyword}
+            </p>
+            <p className="mt-1 text-xs font-bold leading-5 text-muted-foreground">
+              오늘 리포트가 고른 작은 힌트예요.
+            </p>
+          </div>
+          <div className="rounded-lg border border-sky-200 bg-sky-50/70 p-4 shadow-sm dark:border-sky-300/20 dark:bg-sky-400/10">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-black text-sky-700 dark:text-sky-100">
+                오늘의 조심 포인트
+              </p>
+              <Compass className="h-4 w-4 text-sky-600 dark:text-sky-200" />
+            </div>
+            <p className="mt-2 text-lg font-black text-foreground">
+              {cautionPoint.title}
+            </p>
+            <p className="mt-1 text-xs font-bold leading-5 text-muted-foreground">
+              {cautionPoint.description}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -346,13 +386,13 @@ export default function CharacterDailyReport({ ocid }: Props) {
               ? '잠시만요. 오늘의 방향을 고르고 있어요.'
               : status === 'error'
                 ? '데이터가 비어 있는 부분부터 다시 조회해 보세요.'
-                : totalStarforce >= 300
-                  ? '오늘은 장비보다 이벤트와 코디를 확인하기 좋은 상태예요.'
-                  : '오늘은 장비 성장 여지를 먼저 살펴보기 좋아 보여요.'}
+                : dailyFortune.headline}
           </p>
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-border bg-muted/40 p-3 text-sm font-bold text-foreground dark:bg-white/[0.04]">
             <Target className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
-            오늘은 한 섹션만 골라도 충분히 의미 있어요.
+            {status === 'loading'
+              ? '오늘의 추천 행동을 고르고 있어요.'
+              : dailyFortune.action}
           </div>
         </aside>
 
@@ -386,35 +426,63 @@ export default function CharacterDailyReport({ ocid }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        {actions.map(action => {
-          const Icon = action.icon
+      <section className="rounded-lg border border-pink-200 bg-pink-50/55 p-5 shadow-sm dark:border-pink-300/20 dark:bg-pink-400/10">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="inline-flex items-center gap-2 text-sm font-black text-pink-700 dark:text-pink-200">
+              <Sparkles className="h-4 w-4" />
+              캐릭터 별명 생성기
+            </p>
+            <h3 className="mt-2 text-2xl font-black text-foreground">
+              AI 없이 데이터로 만든 별명
+            </h3>
+            <p className="mt-1 text-sm font-medium text-muted-foreground">
+              직업, 레벨, 장비, 코디 아이템을 조합해 가볍게 즐길 수 있는 별명을
+              만듭니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {nicknameStyles.map(style => (
+              <button
+                key={style}
+                type="button"
+                onClick={() => setNicknameStyle(style)}
+                className={`rounded-lg border px-3 py-2 text-xs font-black transition ${
+                  nicknameStyle === style
+                    ? 'border-pink-400 bg-white text-pink-700 shadow-sm dark:border-pink-300 dark:bg-white/10 dark:text-pink-100'
+                    : 'border-pink-200 bg-white/60 text-muted-foreground hover:border-pink-300 hover:text-foreground dark:border-pink-300/20 dark:bg-white/5'
+                }`}>
+                {getNicknameStyleLabel(style)}
+              </button>
+            ))}
+          </div>
+        </div>
 
-          return (
-            <article
-              className="rounded-lg border border-border bg-background/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300/80 hover:shadow-md dark:bg-white/[0.04] dark:hover:border-emerald-400/40"
-              key={action.title}>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ${action.tone}`}>
-                  <Icon className="h-4 w-4" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[11px] font-black text-muted-foreground">
-                    미션 {action.badge}
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {status === 'loading'
+            ? Array.from({ length: 5 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-32 animate-pulse rounded-lg border border-pink-100 bg-white/60 dark:border-pink-300/10 dark:bg-white/5"
+                />
+              ))
+            : generatedNicknames.map((nickname, index) => (
+                <article
+                  key={`${nickname.title}-${index}`}
+                  className="rounded-lg border border-pink-100 bg-white/80 p-4 shadow-sm dark:border-pink-300/15 dark:bg-white/[0.06]">
+                  <span className="rounded-md bg-pink-100 px-2 py-1 text-[11px] font-black text-pink-700 dark:bg-pink-300/15 dark:text-pink-100">
+                    {getNicknameStyleLabel(nickname.style)}
+                  </span>
+                  <h4 className="mt-3 min-h-12 text-base font-black leading-6 text-foreground">
+                    {nickname.title}
+                  </h4>
+                  <p className="mt-2 text-xs font-medium leading-5 text-muted-foreground">
+                    {nickname.description}
                   </p>
-                  <h3 className="text-sm font-black text-foreground">
-                    {action.title}
-                  </h3>
-                </div>
-              </div>
-              <p className="mt-3 text-sm font-medium leading-6 text-muted-foreground">
-                {action.description}
-              </p>
-            </article>
-          )
-        })}
-      </div>
+                </article>
+              ))}
+        </div>
+      </section>
     </section>
   )
 }
