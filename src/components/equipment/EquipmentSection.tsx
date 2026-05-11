@@ -1,9 +1,10 @@
-import { Equipment } from '@/api/character.types'
+import { AbilityResponse, Equipment } from '@/api/character.types'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useCharacterAnalysis } from '@/hooks/useCharacterAnalysis'
 import { useEquipment } from '@/hooks/useEquipment'
 import { cn } from '@/lib/utils'
-import { LayoutGrid, List } from 'lucide-react'
-import { useMemo } from 'react'
+import { LayoutGrid, List, Sparkles } from 'lucide-react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import EquipmentHoverDetails from './EquipmentHoverDetails'
 
 type Props = {
@@ -191,6 +192,371 @@ const getListSummary = (item?: Equipment) => {
     : item?.item_equipment_part || '옵션 정보 없음'
 }
 
+type AbilityPresetNo = 1 | 2 | 3
+type SymbolCategory = 'arcane' | 'authentic'
+
+const getActiveLinkSkills = (
+  linkSkill: ReturnType<
+    typeof useCharacterAnalysis
+  >['analysisData']['linkSkill']
+) => {
+  if (!linkSkill) {
+    return []
+  }
+
+  if (linkSkill.preset_no === 2) {
+    return linkSkill.character_link_skill_preset_2 || []
+  }
+
+  if (linkSkill.preset_no === 3) {
+    return linkSkill.character_link_skill_preset_3 || []
+  }
+
+  return (
+    linkSkill.character_link_skill_preset_1 ||
+    linkSkill.character_link_skill ||
+    []
+  )
+}
+
+const formatNumber = (value?: number | string) => {
+  if (value === undefined || value === '') {
+    return '-'
+  }
+
+  const numericValue =
+    typeof value === 'number'
+      ? value
+      : Number.parseFloat(value.replace(/,/g, ''))
+
+  return Number.isNaN(numericValue)
+    ? String(value)
+    : numericValue.toLocaleString()
+}
+
+const getCombatPower = (
+  stat: ReturnType<typeof useCharacterAnalysis>['analysisData']['stat']
+) => {
+  const combatPower = stat?.final_stat?.find(finalStat => {
+    const statName = finalStat.stat_name || ''
+
+    return (
+      statName.includes('전투력') || statName.toLowerCase().includes('combat')
+    )
+  })
+
+  return formatNumber(combatPower?.stat_value)
+}
+
+const getRepresentativeSetIcon = (
+  setName: string | undefined,
+  equipmentData: Equipment[]
+) => {
+  const normalizedSetName = (setName || '')
+    .replace(/\s/g, '')
+    .replace(/세트$/, '')
+  const setTokens = normalizedSetName
+    .split(/의|보스|장신구/)
+    .map(token => token.trim())
+    .filter(token => token.length >= 2)
+
+  const matchedItem = equipmentData.find(item => {
+    const itemName = (item.item_name || '').replace(/\s/g, '')
+
+    return setTokens.some(token => itemName.includes(token))
+  })
+
+  return matchedItem?.item_shape_icon || matchedItem?.item_icon
+}
+
+const getAbilityPreset = (
+  ability: AbilityResponse | null,
+  presetNo: AbilityPresetNo
+) => {
+  if (!ability) {
+    return { grade: '-', info: [] }
+  }
+
+  if (presetNo === 1) {
+    return {
+      grade:
+        ability.ability_preset_1?.ability_preset_grade ||
+        ability.ability_grade ||
+        '-',
+      info: ability.ability_preset_1?.ability_info || ability.ability_info || []
+    }
+  }
+
+  if (presetNo === 2) {
+    return {
+      grade: ability.ability_preset_2?.ability_preset_grade || '-',
+      info: ability.ability_preset_2?.ability_info || []
+    }
+  }
+
+  return {
+    grade: ability.ability_preset_3?.ability_preset_grade || '-',
+    info: ability.ability_preset_3?.ability_info || []
+  }
+}
+
+function DarkPanel({
+  children,
+  className = ''
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <section
+      className={cn(
+        'rounded-lg border border-slate-700/70 bg-slate-950 p-4 text-white shadow-sm',
+        className
+      )}>
+      {children}
+    </section>
+  )
+}
+
+function CharacterAnalysisOverview({
+  equipmentData,
+  ocid
+}: {
+  equipmentData: Equipment[]
+  ocid: string | undefined
+}) {
+  const { analysisData, status } = useCharacterAnalysis(ocid)
+  const currentAbilityPresetNo =
+    analysisData.ability?.preset_no === 2 ||
+    analysisData.ability?.preset_no === 3
+      ? analysisData.ability.preset_no
+      : 1
+  const [activeAbilityPresetNo, setActiveAbilityPresetNo] =
+    useState<AbilityPresetNo>(currentAbilityPresetNo)
+  const [symbolCategory, setSymbolCategory] = useState<SymbolCategory>('arcane')
+  const setEffects = analysisData.setEffect?.set_effect || []
+  const activeSetEffects = setEffects.filter(
+    effect => (effect.total_set_count || 0) > 0
+  )
+  const symbols = analysisData.symbol?.symbol || []
+  const activeLinkSkills = getActiveLinkSkills(analysisData.linkSkill)
+  const hexaCores = analysisData.hexa?.character_hexa_core_equipment || []
+  const hexaLevelTotal = hexaCores.reduce(
+    (total, core) => total + (core.hexa_core_level || 0),
+    0
+  )
+  const activeAbility = getAbilityPreset(
+    analysisData.ability,
+    activeAbilityPresetNo
+  )
+  const symbolCards = symbols.filter(symbol => {
+    const symbolName = symbol.symbol_name || ''
+    const isAuthentic = symbolName.includes('어센틱')
+
+    return symbolCategory === 'authentic' ? isAuthentic : !isAuthentic
+  })
+  const symbolForceTotal = symbolCards.reduce((total, symbol) => {
+    const force = Number.parseInt(symbol.symbol_force || '0', 10)
+
+    return Number.isNaN(force) ? total : total + force
+  }, 0)
+
+  useEffect(() => {
+    setActiveAbilityPresetNo(currentAbilityPresetNo)
+  }, [currentAbilityPresetNo])
+
+  if (status === 'loading') {
+    return (
+      <DarkPanel>
+        <p className="text-center text-sm font-bold text-slate-300">
+          분석 정보를 불러오는 중입니다.
+        </p>
+      </DarkPanel>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <DarkPanel>
+        <p className="text-center text-sm font-bold text-red-200">
+          분석 정보를 불러오지 못했습니다.
+        </p>
+      </DarkPanel>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <DarkPanel className="py-6 text-center">
+        <p className="text-sm font-black text-slate-300">현재 전투력</p>
+        <p className="mt-2 text-4xl font-black tracking-normal">
+          {getCombatPower(analysisData.stat)}
+        </p>
+      </DarkPanel>
+
+      <DarkPanel>
+        <h3 className="mb-4 text-center text-xl font-black">세트 효과</h3>
+        <div className="space-y-3">
+          {activeSetEffects.slice(0, 5).map((effect, index) => {
+            const iconUrl = getRepresentativeSetIcon(
+              effect.set_name,
+              equipmentData
+            )
+
+            return (
+              <div
+                key={`${effect.set_name}-${index}`}
+                className="grid grid-cols-[3.5rem_2rem_1fr] items-center gap-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-slate-800">
+                  {iconUrl ? (
+                    <img
+                      src={iconUrl}
+                      alt=""
+                      className="h-10 w-10 object-contain [image-rendering:pixelated]"
+                    />
+                  ) : (
+                    <span className="text-base font-black text-emerald-300">
+                      {index + 1}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xl font-black">
+                  {effect.total_set_count || 0}
+                </span>
+                <p className="truncate text-lg font-bold">
+                  {effect.set_name || '세트 정보'}
+                </p>
+              </div>
+            )
+          })}
+          {activeSetEffects.length === 0 && (
+            <p className="rounded-lg border border-dashed border-slate-700 p-4 text-center text-sm font-bold text-slate-400">
+              적용 중인 세트효과가 없습니다.
+            </p>
+          )}
+        </div>
+      </DarkPanel>
+
+      <DarkPanel>
+        <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-slate-600 text-sm font-black">
+          {(['arcane', 'authentic'] as const).map(category => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => setSymbolCategory(category)}
+              className={`h-10 border-slate-600 transition ${
+                symbolCategory === category
+                  ? 'bg-slate-700 text-white'
+                  : 'bg-slate-950 text-slate-300 hover:bg-slate-800'
+              } ${category === 'arcane' ? 'border-r' : ''}`}>
+              {category === 'arcane' ? '아케인' : '어센틱'}
+            </button>
+          ))}
+        </div>
+        <p className="mt-4 text-center text-sm font-bold text-slate-200">
+          심볼 {symbolCards.length}개 · 포스 {formatNumber(symbolForceTotal)}
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          {symbolCards.slice(0, 9).map(symbol => (
+            <div
+              key={symbol.symbol_name}
+              className="rounded-lg bg-slate-800 p-3 text-center">
+              {symbol.symbol_icon ? (
+                <img
+                  src={symbol.symbol_icon}
+                  alt=""
+                  className="mx-auto h-12 w-12 object-contain"
+                />
+              ) : (
+                <Sparkles className="mx-auto h-12 w-12 text-slate-500" />
+              )}
+              <p className="mt-2 text-sm font-black">
+                Lv.{symbol.symbol_level || 0}
+              </p>
+              <div className="mx-auto mt-2 h-1 w-14 bg-slate-300" />
+            </div>
+          ))}
+          {symbolCards.length === 0 && (
+            <div className="col-span-3 rounded-lg border border-dashed border-slate-700 p-4 text-center text-sm font-bold text-slate-400">
+              표시할 심볼이 없습니다.
+            </div>
+          )}
+        </div>
+      </DarkPanel>
+
+      <DarkPanel>
+        <h3 className="text-center text-xl font-black">어빌리티</h3>
+        <p className="mt-3 text-center text-sm font-bold text-slate-300">
+          보유 명성치 : {formatNumber(analysisData.ability?.remain_fame)}
+        </p>
+        <div className="mt-4 space-y-2">
+          {activeAbility.info.slice(0, 3).map((ability, index) => (
+            <div
+              key={`${ability.ability_no}-${index}`}
+              className={`rounded-md px-3 py-2 text-center text-sm font-black ${
+                ability.ability_grade === '레전드리'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-amber-500 text-white'
+              }`}>
+              {ability.ability_value || '어빌리티 정보 없음'}
+            </div>
+          ))}
+          {activeAbility.info.length === 0 && (
+            <p className="rounded-lg border border-dashed border-slate-700 p-4 text-center text-sm font-bold text-slate-400">
+              어빌리티 정보가 없습니다.
+            </p>
+          )}
+        </div>
+        <div className="mt-4 grid grid-cols-4 overflow-hidden rounded-lg border border-slate-600 text-sm font-black">
+          <span className="flex h-10 items-center justify-center border-r border-slate-600 text-slate-300">
+            프리셋
+          </span>
+          {([1, 2, 3] as const).map(presetNo => (
+            <button
+              key={presetNo}
+              type="button"
+              onClick={() => setActiveAbilityPresetNo(presetNo)}
+              className={`h-10 border-r border-slate-600 last:border-r-0 ${
+                activeAbilityPresetNo === presetNo
+                  ? 'bg-slate-700 text-white'
+                  : 'bg-slate-950 text-slate-300 hover:bg-slate-800'
+              }`}>
+              {presetNo}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-black text-slate-300">
+          <span>링크 {activeLinkSkills.length}개</span>
+          <span>
+            유니온{' '}
+            {analysisData.union?.union_level
+              ? `Lv.${analysisData.union.union_level}`
+              : '-'}
+          </span>
+          <span>HEXA Lv.{hexaLevelTotal}</span>
+        </div>
+      </DarkPanel>
+    </div>
+  )
+}
+
+function EquipmentInsightPanel({
+  equipmentData,
+  ocid
+}: {
+  equipmentData: Equipment[]
+  ocid: string | undefined
+}) {
+  return (
+    <aside className="min-w-0 space-y-4 xl:sticky xl:top-24">
+      <CharacterAnalysisOverview
+        equipmentData={equipmentData}
+        ocid={ocid}
+      />
+    </aside>
+  )
+}
+
 function EquipmentSlotButton({
   item,
   slot
@@ -270,11 +636,11 @@ function EquipmentListCard({
       <EquipmentHoverDetails
         item={item}
         className="block">
-        <article className="relative flex min-h-[118px] gap-4 rounded-lg border border-border bg-card p-4 shadow-sm transition hover:border-emerald-300/80 dark:hover:border-emerald-400/40">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50">
+        <article className="relative flex min-h-[92px] gap-3 overflow-hidden rounded-lg border border-border bg-card p-3 shadow-sm transition hover:border-emerald-300/80 dark:hover:border-emerald-400/40">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50">
             {itemIcon ? (
               <img
-                className="h-12 w-12 object-contain"
+                className="h-11 w-11 object-contain [image-rendering:pixelated]"
                 src={itemIcon}
                 alt=""
               />
@@ -284,39 +650,39 @@ function EquipmentListCard({
               </span>
             )}
           </div>
-          <div className="min-w-0 flex-1 pr-16">
-            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          <div className="min-w-0 flex-1 pr-14">
+            <div className="mb-1.5 flex flex-wrap items-center gap-1">
               {starforce > 0 && (
-                <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-xs font-black text-amber-700 dark:bg-amber-400/15 dark:text-amber-200">
+                <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-[11px] font-black text-amber-700 dark:bg-amber-400/15 dark:text-amber-200">
                   {starforce}성
                 </span>
               )}
               {potentialGradeLabel && (
                 <span
-                  className={`rounded-md px-1.5 py-0.5 text-xs font-black ${getCompactGradeClass(item?.potential_option_grade)}`}>
+                  className={`rounded-md px-1.5 py-0.5 text-[11px] font-black ${getCompactGradeClass(item?.potential_option_grade)}`}>
                   {potentialGradeLabel}
                 </span>
               )}
               {additionalGradeLabel && (
                 <span
-                  className={`rounded-md px-1.5 py-0.5 text-xs font-black ${getCompactGradeClass(item?.additional_potential_option_grade)}`}>
+                  className={`rounded-md px-1.5 py-0.5 text-[11px] font-black ${getCompactGradeClass(item?.additional_potential_option_grade)}`}>
                   {additionalGradeLabel}
                 </span>
               )}
               {item?.scroll_upgrade && (
-                <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-bold text-muted-foreground">
+                <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-bold text-muted-foreground">
                   주문서 {item.scroll_upgrade}
                 </span>
               )}
             </div>
-            <p className="truncate text-base font-black text-foreground">
+            <p className="truncate text-sm font-black text-foreground">
               {isLoading ? '장비 정보를 불러오는 중' : item?.item_name || '-'}
             </p>
-            <p className="mt-1 truncate text-sm font-semibold text-muted-foreground">
+            <p className="mt-1 truncate text-xs font-semibold text-muted-foreground">
               {isLoading ? '잠시만 기다려주세요' : getListSummary(item)}
             </p>
           </div>
-          <span className="absolute right-3 top-3 max-w-[72px] truncate rounded-md bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
+          <span className="absolute right-3 top-3 max-w-[64px] truncate rounded-md bg-muted px-2 py-1 text-[11px] font-bold text-muted-foreground">
             {item?.item_equipment_slot || item?.item_equipment_part || '장비'}
           </span>
         </article>
@@ -366,6 +732,44 @@ export default function EquipmentSection({ ocid }: Props) {
       ),
     [sortedEquipmentData]
   )
+  const renderEquipmentControls = () => (
+    <div className="flex flex-col items-start gap-2 sm:items-end">
+      <TabsList className="h-auto rounded-lg border border-border bg-background p-1 shadow-sm dark:bg-white/5">
+        <TabsTrigger
+          value="slots"
+          className="gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground data-[state=active]:border-b-0 data-[state=active]:bg-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-400 dark:data-[state=active]:text-slate-950">
+          <LayoutGrid className="h-4 w-4" />
+          장비창형
+        </TabsTrigger>
+        <TabsTrigger
+          value="list"
+          className="gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground data-[state=active]:border-b-0 data-[state=active]:bg-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-400 dark:data-[state=active]:text-slate-950">
+          <List className="h-4 w-4" />
+          리스트형
+        </TabsTrigger>
+      </TabsList>
+      <div className="flex flex-wrap items-center justify-start gap-2 sm:justify-end">
+        {presets.map(preset => (
+          <button
+            key={preset.presetNo}
+            type="button"
+            disabled={status === 'loading'}
+            onClick={() => setActivePresetNo(preset.presetNo)}
+            className={`rounded-lg border px-3 py-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${
+              activePresetNo === preset.presetNo
+                ? 'border-emerald-400 bg-emerald-50 text-emerald-700 shadow-sm dark:border-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-200'
+                : 'border-border bg-background text-muted-foreground hover:border-emerald-300 hover:text-foreground dark:bg-white/5'
+            }`}>
+            프리셋 {preset.presetNo}
+            {currentPresetNo === preset.presetNo && (
+              <span className="ml-1 text-[10px] font-bold">현재</span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+
   return (
     <section className="space-y-4">
       <header>
@@ -379,88 +783,59 @@ export default function EquipmentSection({ ocid }: Props) {
         <Tabs
           defaultValue="slots"
           className="space-y-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <TabsList className="h-auto rounded-lg border border-border bg-background p-1 shadow-sm dark:bg-white/5">
-              <TabsTrigger
-                value="slots"
-                className="gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground data-[state=active]:border-b-0 data-[state=active]:bg-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-400 dark:data-[state=active]:text-slate-950">
-                <LayoutGrid className="h-4 w-4" />
-                장비창형
-              </TabsTrigger>
-              <TabsTrigger
-                value="list"
-                className="gap-2 rounded-md px-3 py-2 text-sm font-bold text-muted-foreground data-[state=active]:border-b-0 data-[state=active]:bg-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-400 dark:data-[state=active]:text-slate-950">
-                <List className="h-4 w-4" />
-                리스트형
-              </TabsTrigger>
-            </TabsList>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {presets.map(preset => (
-                <button
-                  key={preset.presetNo}
-                  type="button"
-                  disabled={status === 'loading'}
-                  onClick={() => setActivePresetNo(preset.presetNo)}
-                  className={`rounded-lg border px-3 py-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                    activePresetNo === preset.presetNo
-                      ? 'border-emerald-400 bg-emerald-50 text-emerald-700 shadow-sm dark:border-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-200'
-                      : 'border-border bg-background text-muted-foreground hover:border-emerald-300 hover:text-foreground dark:bg-white/5'
-                  }`}>
-                  프리셋 {preset.presetNo}
-                  {currentPresetNo === preset.presetNo && (
-                    <span className="ml-1 text-[10px] font-bold">현재</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <TabsContent
             value="slots"
             className="mt-0">
-            <div className="max-w-[31rem]">
-              <div className="rounded-lg border border-border bg-muted/25 p-3 shadow-sm dark:bg-white/5 sm:p-4">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-black">아이템 슬롯</h3>
-                    <p className="text-xs text-muted-foreground">
-                      장비창 위치 기준으로 장착 아이템을 확인합니다.
-                    </p>
+            <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(30rem,34rem)] xl:items-start">
+              <EquipmentInsightPanel
+                equipmentData={sortedEquipmentData}
+                ocid={ocid}
+              />
+              <div className="min-w-0 w-full xl:justify-self-end">
+                <div className="rounded-lg border border-border bg-muted/25 p-3 shadow-sm dark:bg-white/5 sm:p-4">
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-sm font-black">아이템 슬롯</h3>
+                      <p className="text-xs text-muted-foreground">
+                        장비창 위치 기준으로 장착 아이템을 확인합니다.
+                      </p>
+                      <span className="mt-2 inline-flex rounded-md bg-background px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm dark:bg-white/10">
+                        {status === 'loading'
+                          ? '조회중'
+                          : `${filledSlotDefinitions.length}/${EQUIPMENT_SLOT_DEFINITIONS.length}`}
+                      </span>
+                    </div>
+                    {renderEquipmentControls()}
                   </div>
-                  <span className="rounded-md bg-background px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm dark:bg-white/10">
-                    {status === 'loading'
-                      ? '조회중'
-                      : `${filledSlotDefinitions.length}/${EQUIPMENT_SLOT_DEFINITIONS.length}`}
-                  </span>
-                </div>
-                <div
-                  className="grid grid-cols-5 gap-1.5 rounded-md border border-border/70 bg-background/70 p-2 dark:bg-black/20 sm:gap-2 sm:p-3"
-                  style={{
-                    gridTemplateRows: 'repeat(6, minmax(58px, 1fr))'
-                  }}>
-                  {EQUIPMENT_SLOT_DEFINITIONS.map(slot => (
-                    <EquipmentSlotButton
-                      key={slot.key}
-                      slot={slot}
-                      item={equipmentBySlotKey.get(slot.key)}
-                    />
-                  ))}
-                </div>
-                {extraEquipmentData.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
-                    {extraEquipmentData.map(item => (
-                      <EquipmentHoverDetails
-                        key={`${item.item_equipment_slot}-${item.item_name}`}
-                        item={item}
-                        className="inline-block">
-                        <span className="block rounded-md border border-border bg-card px-2 py-1 text-xs font-bold text-muted-foreground hover:border-emerald-300 hover:text-foreground">
-                          {item.item_equipment_slot || item.item_equipment_part}
-                        </span>
-                      </EquipmentHoverDetails>
+                  <div
+                    className="grid grid-cols-5 gap-1.5 rounded-md border border-border/70 bg-background/70 p-2 dark:bg-black/20 sm:gap-2 sm:p-3"
+                    style={{
+                      gridTemplateRows: 'repeat(6, minmax(58px, 1fr))'
+                    }}>
+                    {EQUIPMENT_SLOT_DEFINITIONS.map(slot => (
+                      <EquipmentSlotButton
+                        key={slot.key}
+                        slot={slot}
+                        item={equipmentBySlotKey.get(slot.key)}
+                      />
                     ))}
                   </div>
-                )}
+                  {extraEquipmentData.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+                      {extraEquipmentData.map(item => (
+                        <EquipmentHoverDetails
+                          key={`${item.item_equipment_slot}-${item.item_name}`}
+                          item={item}
+                          className="inline-block">
+                          <span className="block rounded-md border border-border bg-card px-2 py-1 text-xs font-bold text-muted-foreground hover:border-emerald-300 hover:text-foreground">
+                            {item.item_equipment_slot ||
+                              item.item_equipment_part}
+                          </span>
+                        </EquipmentHoverDetails>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -468,29 +843,53 @@ export default function EquipmentSection({ ocid }: Props) {
           <TabsContent
             value="list"
             className="mt-0">
-            {status === 'loading' ? (
-              <ul className="grid gap-3 lg:grid-cols-2">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <EquipmentListCard
-                    key={index}
-                    isLoading
-                  />
-                ))}
-              </ul>
-            ) : sortedEquipmentData.length > 0 ? (
-              <ul className="grid gap-3 lg:grid-cols-2">
-                {sortedEquipmentData.map(item => (
-                  <EquipmentListCard
-                    key={`${item.item_equipment_slot}-${item.item_name}`}
-                    item={item}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <div className="flex min-h-[220px] items-center justify-center rounded-lg border border-border bg-muted/30 p-6 text-sm font-medium text-muted-foreground">
-                표시할 장비 정보가 없습니다.
+            <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(30rem,34rem)] xl:items-start">
+              <EquipmentInsightPanel
+                equipmentData={sortedEquipmentData}
+                ocid={ocid}
+              />
+              <div className="min-w-0 w-full xl:justify-self-end">
+                <div className="rounded-lg border border-border bg-muted/25 p-3 shadow-sm dark:bg-white/5 sm:p-4">
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-sm font-black">아이템 목록</h3>
+                      <p className="text-xs text-muted-foreground">
+                        장착 아이템을 리스트로 확인합니다.
+                      </p>
+                      <span className="mt-2 inline-flex rounded-md bg-background px-2 py-1 text-xs font-bold text-muted-foreground shadow-sm dark:bg-white/10">
+                        {status === 'loading'
+                          ? '조회중'
+                          : `${sortedEquipmentData.length}개`}
+                      </span>
+                    </div>
+                    {renderEquipmentControls()}
+                  </div>
+                  {status === 'loading' ? (
+                    <ul className="grid gap-2">
+                      {Array.from({ length: 6 }).map((_, index) => (
+                        <EquipmentListCard
+                          key={index}
+                          isLoading
+                        />
+                      ))}
+                    </ul>
+                  ) : sortedEquipmentData.length > 0 ? (
+                    <ul className="grid gap-2">
+                      {sortedEquipmentData.map(item => (
+                        <EquipmentListCard
+                          key={`${item.item_equipment_slot}-${item.item_name}`}
+                          item={item}
+                        />
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="flex min-h-[220px] items-center justify-center rounded-lg border border-border bg-muted/30 p-6 text-sm font-medium text-muted-foreground">
+                      표시할 장비 정보가 없습니다.
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
           </TabsContent>
         </Tabs>
       )}

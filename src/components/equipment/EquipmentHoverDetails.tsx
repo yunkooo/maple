@@ -254,16 +254,24 @@ function StarRows({ starforce }: { starforce: number }) {
       {rows.map((row, rowIndex) => (
         <div
           key={rowIndex}
-          className="flex justify-center gap-0.5">
-          {row.map((isFilled, index) => (
+          className="flex justify-center gap-1.5">
+          {Array.from({ length: Math.ceil(row.length / 5) }, (_, groupIndex) =>
+            row.slice(groupIndex * 5, groupIndex * 5 + 5)
+          ).map((group, groupIndex) => (
             <span
-              key={`${rowIndex}-${index}`}
-              className={
-                isFilled
-                  ? 'text-yellow-300 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]'
-                  : 'text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]'
-              }>
-              {isFilled ? '★' : '☆'}
+              className="inline-flex gap-0.5"
+              key={`${rowIndex}-${groupIndex}`}>
+              {group.map((isFilled, index) => (
+                <span
+                  key={`${rowIndex}-${groupIndex}-${index}`}
+                  className={
+                    isFilled
+                      ? 'text-yellow-300 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]'
+                      : 'text-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]'
+                  }>
+                  {isFilled ? '★' : '☆'}
+                </span>
+              ))}
             </span>
           ))}
         </div>
@@ -301,7 +309,9 @@ function PotentialSection({
       </div>
       <div className="space-y-0.5 text-[11px] font-bold leading-[15px] text-white">
         {options.length > 0 ? (
-          options.map(option => <p key={option}>{option}</p>)
+          options.map((option, index) => (
+            <p key={`${title}-${index}-${option}`}>{option}</p>
+          ))
         ) : (
           <p className="text-white/55">옵션 정보 없음</p>
         )}
