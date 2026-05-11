@@ -101,3 +101,14 @@ export type Equipment = {
 export type EquipmentResponse = {
   item_equipment?: Equipment[]
 }
+
+export type Notice = {
+  notice_id: number
+  title: string
+  url: string
+  date: string
+}
+
+export type NoticeResponse = {
+  notice?: Notice[]
+}
