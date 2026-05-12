@@ -1,10 +1,13 @@
+import type { CharacterBasic, RequestStatus } from '@/api/character.types'
 import { useCharacterBasic } from '@/hooks/useCharacterBasic'
 import { useGuildMark } from '@/hooks/useGuildMark'
 import { CalendarDays, Shield, Sparkles, Trophy } from 'lucide-react'
 import CashEquipmentSummary from './CashEquipmentSummary'
 
 type Props = {
+  basicData?: CharacterBasic
   ocid: string | undefined
+  status?: RequestStatus
 }
 
 type SummaryItem = {
@@ -13,8 +16,16 @@ type SummaryItem = {
   value: string
 }
 
-export default function CharacterProfile({ ocid = '' }: Props) {
-  const { basicData, status } = useCharacterBasic(ocid)
+export default function CharacterProfile({
+  basicData: providedBasicData,
+  ocid = '',
+  status: providedStatus
+}: Props) {
+  const characterBasicQuery = useCharacterBasic(
+    providedBasicData ? undefined : ocid
+  )
+  const basicData = providedBasicData ?? characterBasicQuery.basicData
+  const status = providedStatus ?? characterBasicQuery.status
   const expRate = Number.parseFloat(basicData.character_exp_rate || '0')
   const expWidth = `${Math.min(Math.max(expRate, 0), 100)}%`
   const displayDate = basicData.date ? basicData.date.split('T')[0] : '-'

@@ -79,3 +79,19 @@
       'calt' 1;
   }
 }
+
+@layer components {
+  .character-lookup-progress-bar {
+    animation: character-lookup-progress 1.25s ease-in-out infinite;
+  }
+}
+
+@keyframes character-lookup-progress {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  100% {
+    transform: translateX(210%);
+  }
+}
