@@ -32,6 +32,7 @@ import { useCharacterAnalysis } from '@/hooks/useCharacterAnalysis'
 import { useEquipment } from '@/hooks/useEquipment'
 import { usePetEquipment } from '@/hooks/usePetEquipment'
 import { cn } from '@/lib/utils'
+import { formatNumber } from './equipmentFormatters'
 import {
   Activity,
   Check,
@@ -716,21 +717,6 @@ const getHexaStatCoreLevel = (statCore: HexaMatrixStatCore) =>
 
 const getHexaStatIcon = (index: number) =>
   HEXA_STAT_ICONS[index % HEXA_STAT_ICONS.length]
-
-const formatNumber = (value?: number | string) => {
-  if (value === undefined || value === '') {
-    return '-'
-  }
-
-  const numericValue =
-    typeof value === 'number'
-      ? value
-      : Number.parseFloat(value.replace(/,/g, ''))
-
-  return Number.isNaN(numericValue)
-    ? String(value)
-    : numericValue.toLocaleString()
-}
 
 const getUnionMilestoneProgress = (level?: number) => {
   if (!level || level <= 0) {
