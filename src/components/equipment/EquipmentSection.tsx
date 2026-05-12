@@ -26,6 +26,7 @@ import {
   UnionRaiderResponse,
   UnionResponse
 } from '@/api/character.types'
+import { HOVER_DETAILS_VISIBILITY_CLASS } from '@/components/shared/hoverDetailsClassNames'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCharacterAnalysis } from '@/hooks/useCharacterAnalysis'
 import { useEquipment } from '@/hooks/useEquipment'
@@ -473,7 +474,7 @@ function LinkSkillHoverDetails({
         id={detailsId}
         role="tooltip"
         style={panelStyle}
-        className="pointer-events-none invisible fixed z-[9999] w-[min(20rem,calc(100vw-1rem))] rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+        className={`pointer-events-none invisible fixed z-[9999] w-[min(20rem,calc(100vw-1rem))] rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 ${HOVER_DETAILS_VISIBILITY_CLASS}`}>
         <div className="pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(180deg,rgba(255,255,255,0.1),transparent_36%)]" />
         <div className="relative space-y-3">
           <header className="grid grid-cols-[3.5rem_1fr] gap-3 border-b border-dashed border-white/35 pb-3">
@@ -612,7 +613,7 @@ function HexaStatHoverDetails({
         id={detailsId}
         role="tooltip"
         style={panelStyle}
-        className="pointer-events-none invisible fixed z-[9999] w-[min(20rem,calc(100vw-1rem))] rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+        className={`pointer-events-none invisible fixed z-[9999] w-[min(20rem,calc(100vw-1rem))] rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 ${HOVER_DETAILS_VISIBILITY_CLASS}`}>
         <div className="pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(180deg,rgba(255,255,255,0.1),transparent_36%)]" />
         <div className="relative space-y-3">
           <header className="grid grid-cols-[3.5rem_1fr] gap-3 border-b border-dashed border-white/35 pb-3">

@@ -1,4 +1,5 @@
 import { type PetEquipmentItem } from '@/api/character.types'
+import { HOVER_DETAILS_INTERACTIVE_VISIBILITY_CLASS } from '@/components/shared/hoverDetailsClassNames'
 import { cn } from '@/lib/utils'
 import {
   type ComponentPropsWithoutRef,
@@ -105,7 +106,8 @@ export default function PetEquipmentHoverDetails({
         role="tooltip"
         style={panelStyle}
         className={cn(
-          'pointer-events-none invisible fixed z-[70] w-[min(21rem,calc(100vw-1rem))] overflow-visible rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 max-sm:w-[calc(100vw-1rem)]',
+          'pointer-events-none invisible fixed z-[70] w-[min(21rem,calc(100vw-1rem))] overflow-visible rounded-lg border border-white/80 bg-neutral-950/95 p-3 text-left text-white opacity-0 shadow-2xl shadow-black/60 backdrop-blur-md transition duration-150 max-sm:w-[calc(100vw-1rem)]',
+          HOVER_DETAILS_INTERACTIVE_VISIBILITY_CLASS,
           panelClassName
         )}>
         <div className="pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(180deg,rgba(255,255,255,0.1),transparent_34%)]" />
