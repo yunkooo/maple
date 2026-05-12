@@ -85,7 +85,7 @@ function CodyItemRow({ item, isLoading = false, slotLabel }: CodyCardProps) {
         <CodyItemHoverDetails
           item={item}
           slotLabel={slotLabel}
-          className={`${rowClassName} cursor-help transition hover:bg-pink-50/60 dark:hover:bg-white/[0.04]`}>
+          className={`${rowClassName} cursor-default transition hover:bg-pink-50/60 dark:hover:bg-white/[0.04]`}>
           {rowContent}
         </CodyItemHoverDetails>
       ) : (
