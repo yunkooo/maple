@@ -1,4 +1,9 @@
 import iconUrl from '@/assets/icon.svg'
+import {
+  LAST_SUCCESSFUL_CHARACTER_NICKNAME_EVENT,
+  LAST_SUCCESSFUL_CHARACTER_NICKNAME_STORAGE_KEY,
+  getStoredLastSuccessfulCharacterNickname
+} from '@/lib/lastSuccessfulCharacter'
 import { Bell, Moon, Search, Sun, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -7,24 +12,6 @@ type NavigationItem = {
   icon: typeof UserRound
   label: string
   to: string
-}
-
-const LAST_NICKNAME_STORAGE_KEY = 'maple:lastNickname'
-
-const getStoredNickname = () => {
-  try {
-    return localStorage.getItem(LAST_NICKNAME_STORAGE_KEY)?.trim() || ''
-  } catch {
-    return ''
-  }
-}
-
-const setStoredNickname = (nickname: string) => {
-  try {
-    localStorage.setItem(LAST_NICKNAME_STORAGE_KEY, nickname)
-  } catch {
-    // 검색 유지 기능은 저장소 접근이 막혀도 화면 동작을 방해하지 않습니다.
-  }
 }
 
 const getRouteNickname = (pathname: string, search: string) => {
@@ -83,8 +70,10 @@ export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
   const routeNickname = getRouteNickname(location.pathname, location.search)
-  const [lastNickname, setLastNickname] = useState(() => getStoredNickname())
-  const currentNickname = routeNickname || lastNickname
+  const [lastSuccessfulNickname, setLastSuccessfulNickname] = useState(() =>
+    getStoredLastSuccessfulCharacterNickname()
+  )
+  const currentNickname = routeNickname || lastSuccessfulNickname
   const navigationItems = getNavigationItems(currentNickname)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -104,13 +93,40 @@ export default function Header() {
   }, [isDarkMode])
 
   useEffect(() => {
-    if (!routeNickname) {
-      return
+    const handleNicknameChange = (event: Event) => {
+      const nickname = (
+        event as CustomEvent<{
+          nickname?: string
+        }>
+      ).detail?.nickname?.trim()
+
+      setLastSuccessfulNickname(
+        nickname || getStoredLastSuccessfulCharacterNickname()
+      )
     }
 
-    setLastNickname(routeNickname)
-    setStoredNickname(routeNickname)
-  }, [routeNickname])
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key !== LAST_SUCCESSFUL_CHARACTER_NICKNAME_STORAGE_KEY) {
+        return
+      }
+
+      setLastSuccessfulNickname(event.newValue?.trim() || '')
+    }
+
+    window.addEventListener(
+      LAST_SUCCESSFUL_CHARACTER_NICKNAME_EVENT,
+      handleNicknameChange
+    )
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener(
+        LAST_SUCCESSFUL_CHARACTER_NICKNAME_EVENT,
+        handleNicknameChange
+      )
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
 
   useEffect(() => {
     if (inputRef.current) {
@@ -127,8 +143,6 @@ export default function Header() {
         return
       }
 
-      setLastNickname(nickName)
-      setStoredNickname(nickName)
       navigate(getSearchTargetPath(location.pathname, nickName))
     }
   }

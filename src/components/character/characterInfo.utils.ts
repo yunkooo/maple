@@ -16,6 +16,13 @@ type CharacterLookupPendingInput = {
   status: RequestStatus
 }
 
+type SuccessfulCharacterNicknameInput = {
+  basicData?: CharacterBasic
+  basicStatus?: RequestStatus
+  ocid?: string
+  status: RequestStatus
+}
+
 export function shouldShowCharacterNotFoundFallback({
   basicData,
   basicStatus,
@@ -66,4 +73,23 @@ export function shouldShowCharacterLookupPending({
   }
 
   return Boolean(ocid) && basicStatus === 'loading'
+}
+
+export function getSuccessfulCharacterNickname({
+  basicData,
+  basicStatus,
+  ocid,
+  status
+}: SuccessfulCharacterNicknameInput) {
+  if (
+    !ocid ||
+    status === 'loading' ||
+    status === 'error' ||
+    basicStatus === 'loading' ||
+    basicStatus === 'error'
+  ) {
+    return ''
+  }
+
+  return basicData?.character_name?.trim() || ''
 }

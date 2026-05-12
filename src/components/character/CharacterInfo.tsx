@@ -1,8 +1,11 @@
 import { useCharacterOcid } from '@/hooks/useCharacterOcid'
 import { useCharacterBasic } from '@/hooks/useCharacterBasic'
+import { setStoredLastSuccessfulCharacterNickname } from '@/lib/lastSuccessfulCharacter'
 import { Link, useParams } from 'react-router-dom'
 import { AlertCircle, Loader2, Search, UserX } from 'lucide-react'
+import { useEffect } from 'react'
 import {
+  getSuccessfulCharacterNickname,
   shouldShowCharacterLookupPending,
   shouldShowCharacterNotFoundFallback
 } from './characterInfo.utils'
@@ -126,6 +129,20 @@ export default function CharacterInfo() {
     ocid,
     status
   })
+  const successfulNickname = getSuccessfulCharacterNickname({
+    basicData,
+    basicStatus,
+    ocid,
+    status
+  })
+
+  useEffect(() => {
+    if (!successfulNickname) {
+      return
+    }
+
+    setStoredLastSuccessfulCharacterNickname(successfulNickname)
+  }, [successfulNickname])
 
   return (
     <div className="space-y-5">
