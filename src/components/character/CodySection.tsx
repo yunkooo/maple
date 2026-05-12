@@ -6,6 +6,9 @@ import {
   CASH_PRESET_NUMBERS,
   getBaseCashItems,
   getActivePresetNumber,
+  getBeautyFaceName,
+  getBeautyHairName,
+  getBeautySkinName,
   getCashItemsByPreset,
   sortCashItemsBySlot
 } from './cody.utils'
@@ -197,11 +200,11 @@ export default function CodySection({ ocid }: Props) {
                         : getSlotItem(cashItems, slot)
                     const beautyValue =
                       slot === '헤어'
-                        ? beautyData?.character_hair.hair_name
+                        ? getBeautyHairName(beautyData)
                         : slot === '성형'
-                          ? beautyData?.character_face.face_name
+                          ? getBeautyFaceName(beautyData)
                           : slot === '피부'
-                            ? beautyData?.character_skin_name
+                            ? getBeautySkinName(beautyData)
                             : undefined
 
                     return (

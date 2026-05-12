@@ -86,14 +86,14 @@ export type BeautyEquipmentResponse = {
     hair_name: string
     mix_color: string
     mix_rate: string
-  }
+  } | null
   character_face: {
     base_color: string
     face_name: string
     mix_color: string
     mix_rate: string
-  }
-  character_skin_name: string
+  } | null
+  character_skin_name: string | null
   additional_character_hair: null
   additional_character_face: null
   additional_character_skin_name: null

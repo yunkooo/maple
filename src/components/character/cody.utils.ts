@@ -1,4 +1,8 @@
-import { CashEquipmentResponse, CashItem } from '@/api/character.types'
+import {
+  BeautyEquipmentResponse,
+  CashEquipmentResponse,
+  CashItem
+} from '@/api/character.types'
 
 export type PresetNumber = 1 | 2 | 3
 
@@ -129,6 +133,27 @@ const trimText = (value?: string | null) => value?.trim() || ''
 
 const formatPrismValue = (value: number) =>
   Number.isFinite(value) ? String(value) : '-'
+
+export function getBeautyHairName(
+  beautyData: BeautyEquipmentResponse | null | undefined,
+  fallback = '-'
+) {
+  return trimText(beautyData?.character_hair?.hair_name) || fallback
+}
+
+export function getBeautyFaceName(
+  beautyData: BeautyEquipmentResponse | null | undefined,
+  fallback = '-'
+) {
+  return trimText(beautyData?.character_face?.face_name) || fallback
+}
+
+export function getBeautySkinName(
+  beautyData: BeautyEquipmentResponse | null | undefined,
+  fallback = '-'
+) {
+  return trimText(beautyData?.character_skin_name) || fallback
+}
 
 export function getCashItemPrismSummary(
   item: CashItem

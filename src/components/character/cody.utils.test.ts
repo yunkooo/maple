@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import type { CashItem } from '@/api/character.types'
 import {
   formatCashItemDate,
+  getBeautyFaceName,
+  getBeautyHairName,
   getCashItemOptionRows,
   getCashItemPrismSummary
 } from './cody.utils'
@@ -27,6 +29,36 @@ const createCashItem = (overrides: Partial<CashItem> = {}): CashItem => ({
 })
 
 describe('cody detail helpers', () => {
+  it('헤어와 성형 정보가 null이어도 기본 표시값을 반환한다', () => {
+    expect(
+      getBeautyHairName({
+        character_class: '비숍',
+        character_face: null,
+        character_gender: '여',
+        character_hair: null,
+        date: '2026-05-13',
+        additional_character_face: null,
+        additional_character_hair: null,
+        additional_character_skin_name: null,
+        character_skin_name: ''
+      })
+    ).toBe('-')
+
+    expect(
+      getBeautyFaceName({
+        character_class: '비숍',
+        character_face: null,
+        character_gender: '여',
+        character_hair: null,
+        date: '2026-05-13',
+        additional_character_face: null,
+        additional_character_hair: null,
+        additional_character_skin_name: null,
+        character_skin_name: ''
+      })
+    ).toBe('-')
+  })
+
   it('컬러프리즘 색상과 HSV 값을 상세 정보로 만든다', () => {
     const item = createCashItem({
       cash_item_coloring_prism: {

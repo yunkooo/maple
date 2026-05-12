@@ -28,7 +28,7 @@ import {
   Target
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { getActiveCashItems } from './cody.utils'
+import { getActiveCashItems, getBeautyHairName } from './cody.utils'
 
 type Props = {
   ocid: string | undefined
@@ -242,13 +242,13 @@ export default function CharacterDailyReport({ ocid }: Props) {
     {
       description: beautyData
         ? formatDailyReportTemplate(codyPointMessageTemplate, {
-            hair: beautyData.character_hair.hair_name || '오늘의 헤어'
+            hair: getBeautyHairName(beautyData, '오늘의 헤어')
           })
         : '뷰티 데이터를 불러오면 헤어와 성형 조합이 표시됩니다.',
       icon: Palette,
       label: '오늘의 코디 포인트',
       tone: 'border-pink-200 bg-pink-50/75 text-pink-800 dark:border-pink-300/20 dark:bg-pink-400/10 dark:text-pink-100',
-      value: beautyData?.character_hair.hair_name || '코디 분석 대기'
+      value: getBeautyHairName(beautyData, '코디 분석 대기')
     }
   ]
   return (

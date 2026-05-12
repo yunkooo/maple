@@ -1,6 +1,11 @@
 import { useCashEquipment } from '@/hooks/useCashEquipment'
 import { Shirt } from 'lucide-react'
-import { findCashItemBySlot, getActiveCashItems } from './cody.utils'
+import {
+  findCashItemBySlot,
+  getActiveCashItems,
+  getBeautyFaceName,
+  getBeautyHairName
+} from './cody.utils'
 
 type Props = {
   ocid: string | undefined
@@ -14,8 +19,8 @@ export default function CashEquipmentSummary({ ocid }: Props) {
 
   const outfitRows = [
     ['모자', getItemName('모자') || '-'],
-    ['헤어', beautyData?.character_hair.hair_name || '-'],
-    ['성형', beautyData?.character_face.face_name || '-'],
+    ['헤어', getBeautyHairName(beautyData)],
+    ['성형', getBeautyFaceName(beautyData)],
     ['상의', getItemName('상의') || '-'],
     ['하의', getItemName('하의') || '-'],
     ['신발', getItemName('신발') || '-'],
