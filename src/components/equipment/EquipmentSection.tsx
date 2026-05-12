@@ -888,11 +888,8 @@ function CharacterAnalysisOverview({ ocid }: { ocid: string | undefined }) {
       </InsightCard>
 
       <InsightCard>
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4">
           <h3 className="text-base font-black">적용중인 세트 효과</h3>
-          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
-            {activeSetEffects.length}개
-          </span>
         </div>
         <div className="space-y-3">
           {activeSetEffects.slice(0, 5).map((effect, index) => (
