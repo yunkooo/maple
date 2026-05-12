@@ -4,6 +4,16 @@ export type PresetNumber = 1 | 2 | 3
 
 export type CodyViewKey = 'base' | PresetNumber
 
+export type CashItemOptionRow = {
+  label: string
+  value: string
+}
+
+export type CashItemPrismSummary = {
+  colorRange: string
+  values: string
+}
+
 export const CASH_PRESET_NUMBERS = [1, 2, 3] as const
 
 export function getActivePresetNumber(
@@ -113,4 +123,65 @@ export function sortCashItemsBySlot(cashItems: CashItem[]): CashItem[] {
 
     return leftIndex - rightIndex
   })
+}
+
+const trimText = (value?: string | null) => value?.trim() || ''
+
+const formatPrismValue = (value: number) =>
+  Number.isFinite(value) ? String(value) : '-'
+
+export function getCashItemPrismSummary(
+  item: CashItem
+): CashItemPrismSummary | undefined {
+  const prism = item.cash_item_coloring_prism
+
+  if (!prism) {
+    return undefined
+  }
+
+  const colorRange = trimText(prism.color_range)
+  const hasPrismValue = [prism.hue, prism.saturation, prism.value].some(
+    value => Number.isFinite(value) && value !== 0
+  )
+
+  if (!colorRange && !hasPrismValue) {
+    return undefined
+  }
+
+  return {
+    colorRange: colorRange || '색상 정보 없음',
+    values: `색조 ${formatPrismValue(prism.hue)} · 채도 ${formatPrismValue(
+      prism.saturation
+    )} · 명도 ${formatPrismValue(prism.value)}`
+  }
+}
+
+export function getCashItemOptionRows(item: CashItem): CashItemOptionRow[] {
+  return item.cash_item_option
+    .map(option => ({
+      label: trimText(option.option_type),
+      value: trimText(option.option_value)
+    }))
+    .filter(option => option.label !== '' && option.value !== '')
+}
+
+export function formatCashItemDate(value?: string | null) {
+  const trimmedValue = trimText(value)
+
+  if (!trimmedValue) {
+    return undefined
+  }
+
+  const date = new Date(trimmedValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return trimmedValue
+  }
+
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const hour = String(date.getHours()).padStart(2, '0')
+  const minute = String(date.getMinutes()).padStart(2, '0')
+
+  return `${date.getFullYear()}년 ${month}월 ${day}일 ${hour}시 ${minute}분`
 }

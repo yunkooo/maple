@@ -10,6 +10,7 @@ import {
   sortCashItemsBySlot
 } from './cody.utils'
 import type { CodyViewKey } from './cody.utils'
+import CodyItemHoverDetails from './CodyItemHoverDetails'
 
 type Props = {
   ocid: string | undefined
@@ -31,8 +32,9 @@ const getSlotItem = (items: CashItem[], slot: string) =>
   items.find(item => item.cash_item_equipment_slot === slot)
 
 function CodyItemRow({ item, isLoading = false, slotLabel }: CodyCardProps) {
-  return (
-    <li className="flex min-w-0 items-center gap-3">
+  const rowClassName = 'flex min-w-0 items-center gap-3 rounded-lg px-2 py-1'
+  const rowContent = (
+    <>
       <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md bg-muted/70 dark:bg-white/[0.06]">
         {isLoading ? (
           <span className="h-8 w-8 animate-pulse rounded bg-muted-foreground/20" />
@@ -74,6 +76,21 @@ function CodyItemRow({ item, isLoading = false, slotLabel }: CodyCardProps) {
           </p>
         ) : null}
       </div>
+    </>
+  )
+
+  return (
+    <li className="min-w-0">
+      {item ? (
+        <CodyItemHoverDetails
+          item={item}
+          slotLabel={slotLabel}
+          className={`${rowClassName} cursor-help transition hover:bg-pink-50/60 dark:hover:bg-white/[0.04]`}>
+          {rowContent}
+        </CodyItemHoverDetails>
+      ) : (
+        <div className={rowClassName}>{rowContent}</div>
+      )}
     </li>
   )
 }
