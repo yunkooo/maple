@@ -831,14 +831,6 @@ function CharacterAnalysisOverview({ ocid }: { ocid: string | undefined }) {
   const hexaCores = analysisData.hexa?.character_hexa_core_equipment || []
   const sixthSkills = analysisData.sixthSkill?.character_skill || []
   const hexaStatCores = getActiveHexaStatCores(analysisData.hexaStat)
-  const hexaLevelTotal = hexaCores.reduce(
-    (total, core) => total + (core.hexa_core_level || 0),
-    0
-  )
-  const hexaStatLevelTotal = hexaStatCores.reduce(
-    (total, statCore) => total + getHexaStatCoreLevel(statCore),
-    0
-  )
   const activeAbility = getAbilityPreset(
     analysisData.ability,
     activeAbilityPresetNo
@@ -1022,11 +1014,8 @@ function CharacterAnalysisOverview({ ocid }: { ocid: string | undefined }) {
       </InsightCard>
 
       <InsightCard>
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4">
           <h3 className="text-base font-black">HEXA 스킬</h3>
-          <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-black text-violet-700 dark:bg-violet-400/10 dark:text-violet-100">
-            Lv.{hexaLevelTotal + hexaStatLevelTotal}
-          </span>
         </div>
         <div className="grid grid-cols-4 gap-3">
           {hexaCores.map((core, index) => {
