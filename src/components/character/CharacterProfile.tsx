@@ -47,11 +47,11 @@ export default function CharacterProfile({ ocid = '' }: Props) {
     <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <header className="sr-only">캐릭터 기본 정보</header>
       <div className="grid gap-6 bg-muted/20 p-5 dark:bg-white/[0.025] md:grid-cols-[minmax(260px,320px)_1fr_280px] md:items-center md:p-6">
-        <div className="relative flex min-h-[340px] items-end justify-center overflow-hidden rounded-lg border border-border bg-background p-4 shadow-inner dark:bg-white/[0.035] md:min-h-[390px]">
-          <div className="relative z-10 flex h-80 w-80 items-center justify-center sm:h-96 sm:w-96">
+        <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden rounded-lg border border-border bg-background p-4 shadow-inner dark:bg-white/[0.035] md:min-h-[300px]">
+          <div className="relative z-10 flex h-[22rem] w-[22rem] items-center justify-center sm:h-96 sm:w-96">
             {basicData.character_image ? (
               <img
-                className="h-72 w-72 scale-[1.68] object-contain drop-shadow-[0_24px_32px_rgba(15,23,42,0.24)] [image-rendering:pixelated] sm:h-80 sm:w-80 md:scale-[1.62]"
+                className="h-[22rem] w-[22rem] scale-[1.72] object-contain drop-shadow-[0_20px_28px_rgba(15,23,42,0.2)] [image-rendering:pixelated] sm:h-96 sm:w-96 md:scale-[1.68]"
                 src={basicData.character_image}
                 alt={basicData.character_name || '캐릭터 이미지'}
               />
